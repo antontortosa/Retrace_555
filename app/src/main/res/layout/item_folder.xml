@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="5dp">
+
+    <TextView
+        android:id="@+id/item_folder_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Home"
+        android:textAppearance="?android:textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/item_folder_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+
+        android:text="&#8942;"
+        android:textAppearance="?android:textAppearanceLarge" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/item_folder_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/item_folder_title"
+        android:textAppearance="?android:textAppearanceMedium" />
+</RelativeLayout>
