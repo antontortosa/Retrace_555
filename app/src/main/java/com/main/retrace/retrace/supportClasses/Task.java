@@ -1,4 +1,4 @@
-package com.main.retrace.retrace;
+package com.main.retrace.retrace.supportClasses;
 
 import java.util.Date;
 
@@ -44,5 +44,25 @@ public class Task {
         this.creationDate = creationDate;
         this.dueDate = dueDate;
         this.completionDate = null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public Date getCompletionDate() {
+        return completionDate;
     }
 }

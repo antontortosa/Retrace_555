@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="5dp">
+
+    <TextView
+        android:id="@+id/item_folder_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceLarge"
+        tools:text="Home" />
+
+    <!-- TODO: replace with proper icon -->
+    <TextView
+        android:id="@+id/item_folder_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:text="&#8942;"
+        android:textAppearance="?android:textAppearanceLarge" />
+
+    <ListView
+        android:id="@+id/item_folder_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/item_folder_title"
+        android:drawSelectorOnTop="false"
+        android:textAppearance="?android:textAppearanceMedium"
+        tools:listitem="@layout/task_item">
+    </ListView>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/folder_item_textinputlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/item_folder_tasks">
+
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/task_item_textSize"
+            android:hint="@string/folder_item_newtask" />
+    </android.support.design.widget.TextInputLayout>
+
+
+</RelativeLayout>
