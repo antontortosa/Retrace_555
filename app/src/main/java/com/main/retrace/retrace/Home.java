@@ -3,6 +3,9 @@ package com.main.retrace.retrace;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,9 +15,31 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
-public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.Date;
+
+public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    /**
+     * Stores the folders.
+     */
+    private ArrayList<Folder> folders;
+
+    /**
+     * RecyclerView for the folders.
+     */
+    private RecyclerView mFoldersRecyclerView;
+
+    /**
+     * Adapter for the RecyclerView.
+     */
+    private RecyclerView.Adapter mAdapter;
+
+    /**
+     * LinearLayoutManager for the RecyclerView.
+     */
+    private LinearLayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +48,7 @@ public class Home extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_folder);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,6 +65,19 @@ public class Home extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        folders = fakeContentCreator();
+
+        // Recycle view setup.
+        mFoldersRecyclerView = (RecyclerView) findViewById(R.id.folders_recycler_view);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mFoldersRecyclerView.setLayoutManager(mLayoutManager);
+
+        // specify an adapter (see also next example)
+        mAdapter = new FolderAdapter(folders, getApplicationContext());
+        mFoldersRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -55,23 +93,8 @@ public class Home extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home, menu);
+        getMenuInflater().inflate(R.menu.search_menu, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -97,5 +120,19 @@ public class Home extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private ArrayList<Folder> fakeContentCreator() {
+        ArrayList<Folder> folders = new ArrayList<Folder>();
+
+        folders.add(new Folder("Home", new ArrayList<Task>() {{
+            add(new Task("Clean the house", null, null));
+            add(new Task("Finish the Android Project", null, null));
+        }}));
+        folders.add(new Folder("Work", new ArrayList<Task>() {{
+            add(new Task("Meeting with boss", null, null));
+        }}));
+
+        return folders;
     }
 }
