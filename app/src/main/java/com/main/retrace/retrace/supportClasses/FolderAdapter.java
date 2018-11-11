@@ -1,15 +1,17 @@
-package com.main.retrace.retrace;
+package com.main.retrace.retrace.supportClasses;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+
+import com.main.retrace.retrace.R;
 
 import java.util.ArrayList;
 
@@ -35,29 +37,34 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
      * @param folders the data.
      */
     public FolderAdapter(ArrayList<Folder> folders, Context context) {
-        mFolderData = folders;
+        this.mFolderData = folders;
         this.context = context;
     }
 
-    // Create new views (invoked by the layout manager)
+    /**
+     * This method creates new views (invoked by the layout manager).
+     */
     @Override
     public FolderAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         // Inflate the custom layout
-        View contactView = inflater.inflate(R.layout.item_folder, parent, false);
+        View folderView = inflater.inflate(R.layout.folder_item, parent, false);
 
         // Return a new holder instance
-        MyViewHolder viewHolder = new MyViewHolder(contactView);
+        MyViewHolder viewHolder = new MyViewHolder(folderView);
+
         return viewHolder;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    /**
+     * This method replaces the contents of a view (invoked by the layout manager).
+     */
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         // - get element from your dataset at this position
         // Get the data model based on position
-        Folder contact = mFolderData.get(position);
+        Folder folder = mFolderData.get(position);
 
         // - replace the contents of the view with that element
         holder.mTextViewTitle.setText(mFolderData.get(position).getTitle());
@@ -94,9 +101,34 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
 
             }
         });
+
+        TaskAdapter taskAdapter = new TaskAdapter(mFolderData.get(position).getTasks(), context);
+
+        holder.tasks.setAdapter(taskAdapter);
+
+        // To get the right height of the ListView.
+        int totalHeight = 0;
+        for (int i = 0; i < holder.tasks.getCount(); i++) {
+            View listItem = taskAdapter.getView(i, null, holder.tasks);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = holder.tasks.getLayoutParams();
+        params.height = totalHeight + (holder.tasks.getDividerHeight() * (taskAdapter.getCount() - 1));
+        holder.tasks.setLayoutParams(params);
+        holder.tasks.requestLayout();
+
+        holder.tasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO
+            }
+        });
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    /**
+     * Returns the size of your dataset (invoked by the layout manager).
+     */
     @Override
     public int getItemCount() {
         return mFolderData.size();
@@ -117,7 +149,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
         /**
          * RecyclerView with the tasks.
          */
-        public RecyclerView tasks;
+        public ListView tasks;
         /**
          * Folder options.
          */
@@ -132,9 +164,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
             super(itemView);
 
             this.mTextViewTitle = (TextView) itemView.findViewById(R.id.item_folder_title);
-            this.tasks = (RecyclerView) itemView.findViewById(R.id.item_folder_tasks);
-            this.buttonViewOption = (TextView)   itemView.findViewById(R.id.item_folder_menu);
-
+            this.tasks = (ListView) itemView.findViewById(R.id.item_folder_tasks);
+            this.buttonViewOption = (TextView) itemView.findViewById(R.id.item_folder_menu);
         }
     }
 }

@@ -11,4 +11,5 @@
     <string name="folder_menu_open_place">Open Place Folder</string>
     <string name="folder_menu_edit">Edit Place </string>
     <string name="folder_menu_delete">Delete Place</string>
+    <string name="folder_item_newtask"> + New Task</string>
 </resources>

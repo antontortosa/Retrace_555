@@ -5,7 +5,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,10 +14,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
+
+import com.main.retrace.retrace.supportClasses.Folder;
+import com.main.retrace.retrace.supportClasses.FolderAdapter;
+import com.main.retrace.retrace.supportClasses.Task;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /**
@@ -131,6 +132,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }}));
         folders.add(new Folder("Work", new ArrayList<Task>() {{
             add(new Task("Meeting with boss", null, null));
+            add(new Task("Clean table", null, null));
+            add(new Task("Decide vacations", null, null));
         }}));
 
         return folders;
