@@ -17,4 +17,16 @@
     <string name="folder_menu_edit">Edit Place </string>
     <string name="folder_menu_delete">Delete Place</string>
     <string name="folder_item_newtask"> + New Task</string>
+
+    <!-- Strings related to login -->
+    <string name="title_activity_login">Login</string>
+    <string name="login_welcome">Welcome to Retrace</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Submit</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
 </resources>

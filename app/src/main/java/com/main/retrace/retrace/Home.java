@@ -1,31 +1,41 @@
 package com.main.retrace.retrace;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.main.retrace.retrace.supportClasses.DatabaseManager;
 import com.main.retrace.retrace.supportClasses.Folder;
 import com.main.retrace.retrace.supportClasses.FolderAdapter;
+import com.main.retrace.retrace.supportClasses.LatLngCus;
 import com.main.retrace.retrace.supportClasses.Task;
 
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /**
      * Stores the folders.
      */
-    private ArrayList<Folder> folders;
+    private HashMap<String, Folder> folders;
 
     /**
      * RecyclerView for the folders.
@@ -41,6 +51,18 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      * LinearLayoutManager for the RecyclerView.
      */
     private LinearLayoutManager mLayoutManager;
+
+    /**
+     * Progress bar view.
+     */
+    private View mProgressView;
+
+    /**
+     * Reference to the database manager.
+     */
+    private DatabaseManager dbManager;
+
+    private final static String userId = "-LRdRidR3LUhzN_xSTcT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,18 +89,31 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        folders = fakeContentCreator();
+        // Progress view setup.
+        mProgressView = findViewById(R.id.loading_progress);
 
         // Recycle view setup.
         mFoldersRecyclerView = (RecyclerView) findViewById(R.id.folders_recycler_view);
+        mFoldersRecyclerView.setVisibility(View.GONE);
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mFoldersRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
-        mAdapter = new FolderAdapter(folders, getApplicationContext());
-        mFoldersRecyclerView.setAdapter(mAdapter);
+        // Show the progress since we are loading the data from the Database.
+        showProgress(true);
+
+        // Depending if the Database a different thing is executed.
+        final boolean databaseEmpty = false;
+        if (databaseEmpty) {
+            Log.d("DB", "Creating faking content for the Database.");
+            folders = fakeContentCreator();
+            dbManager = new DatabaseManager(userId, folders, this);
+            populateDatabase();
+        } else {
+            folders = new HashMap<String, Folder>();
+            dbManager = new DatabaseManager(userId, folders, this);
+        }
     }
 
     @Override
@@ -128,19 +163,71 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return true;
     }
 
-    private ArrayList<Folder> fakeContentCreator() {
-        ArrayList<Folder> folders = new ArrayList<Folder>();
-
-        folders.add(new Folder("Home", new ArrayList<Task>() {{
-            add(new Task("Clean the house", null, null));
-            add(new Task("Finish the Android Project", null, null));
+    /**
+     * Creates a set of fake data.
+     *
+     * @return an ArrayList with the folders.
+     */
+    private HashMap<String, Folder> fakeContentCreator() {
+        HashMap<String, Folder> folders = new HashMap<String, Folder>();
+        // Location corresponds to 1237 Fullerton
+        folders.put("0", new Folder("Home", new LatLngCus(41.925017, -87.659908), new HashMap<String, Task>() {{
+            put("0", new Task("Clean the house", new GregorianCalendar(2014, Calendar.FEBRUARY, 11).getTime(), null));
+            put("1", new Task("Finish the Android Project", new GregorianCalendar(2015, Calendar.MARCH, 16).getTime(), new GregorianCalendar(2018, Calendar.NOVEMBER, 26).getTime()));
         }}));
-        folders.add(new Folder("Work", new ArrayList<Task>() {{
-            add(new Task("Meeting with boss", null, null));
-            add(new Task("Clean table", null, null));
-            add(new Task("Decide vacations", null, null));
+        // Location corresponds to Wishnick hall.
+        folders.put("1", new Folder("Work", new LatLngCus(41.835118, -87.627608), new HashMap<String, Task>() {{
+            put("0", new Task("Meeting with boss", null, null));
+            put("1", new Task("Clean table", null, null));
+            put("2", new Task("Decide vacations", null, null));
         }}));
 
         return folders;
+    }
+
+    /**
+     * Populates the database with the folders.
+     */
+    private void populateDatabase() {
+        Iterator<String> folderIterator = folders.keySet().iterator();
+        while (folderIterator.hasNext()) {
+            Folder folder = folders.get(folderIterator.next());
+            String folderId = dbManager.writeFolder(userId, folder.getTitle(), folder.getLocation());
+            Iterator<String> taskIterator = folder.getTasks().keySet().iterator();
+            while (taskIterator.hasNext()) {
+                dbManager.writeTask(userId, folderId, folder.getTasks().get(taskIterator.next()));
+            }
+        }
+    }
+
+    /**
+     * Shows the progress UI and hides the login form. It only shows the progress spinner if the api running on the phone supports it.
+     */
+    public void showProgress(final boolean show) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mFoldersRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mFoldersRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+
+        if (!show) {
+            // specify an adapter (see also next example), we couldn't do this because the data wasn't loaded.
+            mAdapter = new FolderAdapter(new LinkedHashMap<String, Folder>(folders), getApplicationContext());
+            mFoldersRecyclerView.setAdapter(mAdapter);
+        }
     }
 }
