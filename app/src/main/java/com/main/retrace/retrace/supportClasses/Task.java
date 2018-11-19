@@ -1,5 +1,6 @@
 package com.main.retrace.retrace.supportClasses;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -30,6 +31,28 @@ public class Task {
      * When the task was completed.
      */
     private Date completionDate;
+
+    /**
+     * Empty constructor for Firebase compatibility.
+     */
+    public Task() {}
+
+    /**
+     * Constructor with all parameters for Firebase compatibility.
+     *
+     * @param name
+     * @param done
+     * @param creationDate
+     * @param dueDate
+     * @param completionDate
+     */
+    public Task(String name, Boolean done, Date creationDate, Date dueDate, Date completionDate) {
+        this.name = name;
+        this.done = done;
+        this.creationDate = creationDate;
+        this.dueDate = dueDate;
+        this.completionDate = completionDate;
+    }
 
     /**
      * Constructor for the task. By default the {@link Task#completionDate} is null.
