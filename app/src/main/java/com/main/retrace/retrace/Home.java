@@ -2,24 +2,28 @@ package com.main.retrace.retrace;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.main.retrace.retrace.supportClasses.DatabaseManager;
 import com.main.retrace.retrace.supportClasses.Folder;
 import com.main.retrace.retrace.supportClasses.FolderAdapter;
 import com.main.retrace.retrace.supportClasses.Task;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /**
@@ -41,6 +45,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      * LinearLayoutManager for the RecyclerView.
      */
     private LinearLayoutManager mLayoutManager;
+
+    /**
+     * Reference to the database manager.
+     */
+    private DatabaseManager dbManager;
+
+    private final static String userId = "-LRdRidR3LUhzN_xSTcT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +78,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        folders = fakeContentCreator();
+        //folders = fakeContentCreator();
+        ArrayList<Folder> folders = new ArrayList<Folder>();
+        dbManager = new DatabaseManager(userId, folders);
 
         // Recycle view setup.
         mFoldersRecyclerView = (RecyclerView) findViewById(R.id.folders_recycler_view);
@@ -128,12 +141,17 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return true;
     }
 
+    /**
+     * Creates a set of fake data.
+     *
+     * @return an ArrayList with the folders.
+     */
     private ArrayList<Folder> fakeContentCreator() {
         ArrayList<Folder> folders = new ArrayList<Folder>();
 
         folders.add(new Folder("Home", new ArrayList<Task>() {{
-            add(new Task("Clean the house", null, null));
-            add(new Task("Finish the Android Project", null, null));
+            add(new Task("Clean the house", new GregorianCalendar(2014, Calendar.FEBRUARY, 11).getTime(), null));
+            add(new Task("Finish the Android Project", new GregorianCalendar(2015, Calendar.MARCH, 16).getTime(), new GregorianCalendar(2018, Calendar.NOVEMBER, 26).getTime()));
         }}));
         folders.add(new Folder("Work", new ArrayList<Task>() {{
             add(new Task("Meeting with boss", null, null));
@@ -142,5 +160,21 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }}));
 
         return folders;
+    }
+
+    /**
+     * Populates the database with the folders.
+     */
+    private void populateDatabase() {
+        Iterator<Folder> folderIterator = folders.iterator();
+        while (folderIterator.hasNext()) {
+            Folder folder = folderIterator.next();
+            String folderId = dbManager.writeFolder(userId, folder.getTitle());
+            Iterator<Task> taskIterator = folder.getTasks().iterator();
+            while (taskIterator.hasNext()) {
+                dbManager.writeTask(userId, folderId, taskIterator.next());
+            }
+
+        }
     }
 }

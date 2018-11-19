@@ -14,7 +14,7 @@ public class Task {
     /**
      * If the task is done it is true.
      */
-    private boolean done;
+    private Boolean done;
 
     /**
      * When the task was created.
