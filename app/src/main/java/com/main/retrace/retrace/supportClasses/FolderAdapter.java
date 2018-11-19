@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.main.retrace.retrace.R;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * Customized Folder Adapter.
@@ -22,7 +23,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
     /**
      * Folder Data.
      */
-    private ArrayList<Folder> mFolderData;
+    private LinkedHashMap<String, Folder> mFolderData;
 
     /**
      * Reference to the context.
@@ -36,7 +37,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
      *
      * @param folders the data.
      */
-    public FolderAdapter(ArrayList<Folder> folders, Context context) {
+    public FolderAdapter(LinkedHashMap<String, Folder> folders, Context context) {
         this.mFolderData = folders;
         this.context = context;
     }
@@ -64,10 +65,10 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         // - get element from your dataset at this position
         // Get the data model based on position
-        Folder folder = mFolderData.get(position);
+        Folder folder = new ArrayList<Folder>(mFolderData.values()).get(position);
 
         // - replace the contents of the view with that element
-        holder.mTextViewTitle.setText(mFolderData.get(position).getTitle());
+        holder.mTextViewTitle.setText(folder.getTitle());
         // Same for tasks.
 
         holder.buttonViewOption.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +103,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
             }
         });
 
-        TaskAdapter taskAdapter = new TaskAdapter(mFolderData.get(position).getTasks(), context);
+        TaskAdapter taskAdapter = new TaskAdapter(new LinkedHashMap<String, Task>(folder.getTasks()), context);
 
         holder.tasks.setAdapter(taskAdapter);
 

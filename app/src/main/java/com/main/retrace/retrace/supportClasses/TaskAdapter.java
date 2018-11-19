@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import com.main.retrace.retrace.R;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * This class is the TaskAdapter.
@@ -18,7 +19,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
     /**
      * Task Data.
      */
-    private ArrayList<Task> mTaskData;
+    private LinkedHashMap<String, Task> mTaskData;
 
     /**
      * Reference to the context.
@@ -35,8 +36,8 @@ public class TaskAdapter extends ArrayAdapter<Task> {
      *
      * @param tasks the data.
      */
-    public TaskAdapter(ArrayList<Task> tasks, Context context) {
-        super(context, R.layout.task_item, tasks);
+    public TaskAdapter(LinkedHashMap<String, Task> tasks, Context context) {
+        super(context, R.layout.task_item, new ArrayList<Task>(tasks.values()));
         this.mTaskData = tasks;
         this.context = context;
     }
