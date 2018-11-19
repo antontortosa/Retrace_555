@@ -19,6 +19,7 @@
     <string name="folder_item_newtask"> + New Task</string>
 
     <!-- Strings related to login -->
+    <string name="title_activity_login">Login</string>
     <string name="login_welcome">Welcome to Retrace</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
