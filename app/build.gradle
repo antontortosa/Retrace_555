@@ -30,6 +30,11 @@ dependencies {
     // Firebase implementations
     implementation 'com.google.firebase:firebase-core:16.0.4'
     implementation 'com.google.firebase:firebase-database:16.0.4'
+    implementation 'com.google.firebase:firebase-auth:16.0.5'
+    implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
+    // Required for facebook & twitter login (deactivated but left if needed later on)
+    //implementation 'com.facebook.android:facebook-android-sdk:4.38.1'
+    //implementation 'com.twitter.sdk.android:twitter-core:3.3.0'
     // Google Maps
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
 
