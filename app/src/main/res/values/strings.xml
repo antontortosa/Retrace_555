@@ -29,4 +29,10 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+
+    <!-- Strings related to Edit/Create Folder -->
+    <string name="folder_new_name">Folder Name</string>
+    <string name="folder_location">Location</string>
+    <string name="folder_add_location">Add Location</string>
+    <string name="folder_save_button">Save</string>
 </resources>
