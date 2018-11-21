@@ -11,6 +11,7 @@ import com.main.retrace.retrace.Home;
 
 import java.util.HashMap;
 
+
 /**
  * This class helps with the management of the database.
  */
@@ -33,6 +34,7 @@ public class DatabaseManager {
 
     private HashMap<String, Folder> folders;
 
+
     private final static String USER_CHILDNAME = "users";
     private final static String FOLDER_CHILDNAME = "folders";
     private final static String TASK_CHILDNAME = "tasks";
@@ -40,7 +42,7 @@ public class DatabaseManager {
     private final static String FOLDER_KEY_TITLE = "title";
     private final static String FOLDER_KEY_LOCATION = "location";
 
-    public DatabaseManager(final String userId, HashMap<String, Folder> folders, final Home home) {
+    public DatabaseManager(final String userId, final HashMap<String, Folder> folders, final Home home) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         this.folders = folders;
         this.home = home;
@@ -109,4 +111,6 @@ public class DatabaseManager {
     public HashMap<String, Folder> getFolders() {
         return folders;
     }
+
+
 }

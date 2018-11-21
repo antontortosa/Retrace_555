@@ -16,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
@@ -37,7 +41,10 @@ dependencies {
     //implementation 'com.twitter.sdk.android:twitter-core:3.3.0'
     // Google Maps
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.maps.android:android-maps-utils:0.5+'
 
+    //location
+    implementation "com.google.android.gms:play-services-location:15.0.1"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
