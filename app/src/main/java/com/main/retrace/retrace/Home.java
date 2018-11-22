@@ -2,8 +2,11 @@ package com.main.retrace.retrace;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -18,18 +21,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.main.retrace.retrace.supportClasses.CircleTransform;
 import com.main.retrace.retrace.supportClasses.DatabaseManager;
 import com.main.retrace.retrace.supportClasses.Folder;
 import com.main.retrace.retrace.supportClasses.FolderAdapter;
 import com.main.retrace.retrace.supportClasses.LatLngCus;
 import com.main.retrace.retrace.supportClasses.Task;
+import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     /**
@@ -62,16 +72,29 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      */
     private DatabaseManager dbManager;
 
-    private final static String userId = "-LRdRidR3LUhzN_xSTcT";
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        // Receiving user info after login
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // User is signed in
+            Log.d("Login", "User info received correctly at the Home Activity.");
+            this.user = user;
+        } else {
+            // No user is signed in
+            Log.d("Login", "User shouldn't be here without logging in first. ");
+            finish();
+        }
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_folder);
+        FloatingActionButton fab = findViewById(R.id.add_folder);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,20 +103,36 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Set user name & profile picture
+        View headerView = navigationView.getHeaderView(0);
+        ImageView imageView = headerView.findViewById(R.id.nav_imageView);
+        Drawable imageDrawable = imageView.getDrawable();
+
+        Picasso.with(Home.this)
+                .load(user.getPhotoUrl())
+                .placeholder(imageDrawable)
+                .resize(100, 100)
+                .centerCrop()
+                .transform(new CircleTransform())
+                .into(imageView);
+
+        ((TextView) headerView.findViewById(R.id.nav_userTextview)).setText(user.getDisplayName());
+        ((TextView) headerView.findViewById(R.id.nav_emailTextView)).setText(user.getEmail());
 
         // Progress view setup.
         mProgressView = findViewById(R.id.loading_progress);
 
         // Recycle view setup.
-        mFoldersRecyclerView = (RecyclerView) findViewById(R.id.folders_recycler_view);
+        mFoldersRecyclerView = findViewById(R.id.folders_recycler_view);
         mFoldersRecyclerView.setVisibility(View.GONE);
 
         // use a linear layout manager
@@ -105,20 +144,18 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         // Depending if the Database a different thing is executed.
         final boolean databaseEmpty = false;
+        dbManager = new DatabaseManager(this);
         if (databaseEmpty) {
             Log.d("DB", "Creating faking content for the Database.");
             folders = fakeContentCreator();
-            dbManager = new DatabaseManager(userId, folders, this);
-            populateDatabase();
-        } else {
-            folders = new HashMap<String, Folder>();
-            dbManager = new DatabaseManager(userId, folders, this);
+            dbManager.setFolders(folders);
+            populateDatabase("bNaSdXkbmzQ7tRsRDizZ11pUorx1");
         }
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -155,10 +192,18 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         } else if (id == R.id.nav_logout) {
             // Log out from app
-
+            AuthUI.getInstance()
+                    .signOut(this)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                            Log.d("Login", "User logged out correctly, redirecting to log in.");
+                            startActivity(new Intent(Home.this, LoginActivity.class));
+                        }
+                    });
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -186,16 +231,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     /**
-     * Populates the database with the folders.
+     * Triggers the update of the database so it is updated with the value of the folders attribute.
      */
-    private void populateDatabase() {
-        Iterator<String> folderIterator = folders.keySet().iterator();
-        while (folderIterator.hasNext()) {
-            Folder folder = folders.get(folderIterator.next());
+    private void populateDatabase(String userId) {
+        for (String s : folders.keySet()) {
+            Folder folder = folders.get(s);
             String folderId = dbManager.writeFolder(userId, folder.getTitle(), folder.getLocation());
-            Iterator<String> taskIterator = folder.getTasks().keySet().iterator();
-            while (taskIterator.hasNext()) {
-                dbManager.writeTask(userId, folderId, folder.getTasks().get(taskIterator.next()));
+            for (String s1 : folder.getTasks().keySet()) {
+                dbManager.writeTask(userId, folderId, folder.getTasks().get(s1));
             }
         }
     }
@@ -226,8 +269,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         if (!show) {
             // specify an adapter (see also next example), we couldn't do this because the data wasn't loaded.
-            mAdapter = new FolderAdapter(new LinkedHashMap<String, Folder>(folders), getApplicationContext());
+            mAdapter = new FolderAdapter(dbManager, getApplicationContext());
             mFoldersRecyclerView.setAdapter(mAdapter);
         }
+    }
+
+    public FirebaseUser getUser() {
+        return user;
     }
 }

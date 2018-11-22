@@ -1,11 +1,15 @@
 package com.main.retrace.retrace.supportClasses;
 
 import android.content.Context;
+import android.icu.util.Calendar;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -30,16 +34,20 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
      */
     private Context context;
 
-    // Provide a suitable constructor (depends on the kind of dataset)
+    /**
+     * Reference to the Database Manager.
+     */
+    private DatabaseManager databaseManager;
 
     /**
      * Constructor for the class.
      *
-     * @param folders the data.
+     * @param databaseManager reference.
      */
-    public FolderAdapter(LinkedHashMap<String, Folder> folders, Context context) {
-        this.mFolderData = folders;
+    public FolderAdapter(DatabaseManager databaseManager, Context context) {
+        this.mFolderData = new LinkedHashMap<String, Folder>(databaseManager.getFolders());
         this.context = context;
+        this.databaseManager = databaseManager;
     }
 
     /**
@@ -53,9 +61,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
         View folderView = inflater.inflate(R.layout.folder_item, parent, false);
 
         // Return a new holder instance
-        MyViewHolder viewHolder = new MyViewHolder(folderView);
-
-        return viewHolder;
+        return new MyViewHolder(databaseManager, folderView);
     }
 
     /**
@@ -66,6 +72,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
         // - get element from your dataset at this position
         // Get the data model based on position
         Folder folder = new ArrayList<Folder>(mFolderData.values()).get(position);
+        String folderId = new ArrayList<String>(mFolderData.keySet()).get(position);
 
         // - replace the contents of the view with that element
         holder.mTextViewTitle.setText(folder.getTitle());
@@ -103,7 +110,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
             }
         });
 
-        TaskAdapter taskAdapter = new TaskAdapter(new LinkedHashMap<String, Task>(folder.getTasks()), context);
+        holder.setFolderId(folderId);
+
+        TaskAdapter taskAdapter = new TaskAdapter(databaseManager, folderId, context);
 
         holder.tasks.setAdapter(taskAdapter);
 
@@ -146,27 +155,71 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
         /**
          * Title of the folder
          */
-        public TextView mTextViewTitle;
+        private TextView mTextViewTitle;
         /**
          * RecyclerView with the tasks.
          */
-        public ListView tasks;
+        private ListView tasks;
         /**
          * Folder options.
          */
-        public TextView buttonViewOption;
+        private TextView buttonViewOption;
+        /**
+         * Reference to the TectInputEditText textedit for the creation of new tasks.
+         */
+        private TextInputEditText newTaskTextEdit;
+        /**
+         * Reference to the folderId where the TextEdit is located.
+         */
+        private String folderId;
 
         /**
          * Constructor.
          *
-         * @param itemView
+         * @param databaseManager reference.
+         * @param itemView        of the current item.
          */
-        public MyViewHolder(View itemView) {
+        private MyViewHolder(final DatabaseManager databaseManager, View itemView) {
             super(itemView);
 
-            this.mTextViewTitle = (TextView) itemView.findViewById(R.id.item_folder_title);
-            this.tasks = (ListView) itemView.findViewById(R.id.item_folder_tasks);
-            this.buttonViewOption = (TextView) itemView.findViewById(R.id.item_folder_menu);
+            this.mTextViewTitle = itemView.findViewById(R.id.folder_item_title);
+            this.tasks = itemView.findViewById(R.id.folder_item_tasks);
+            this.buttonViewOption = itemView.findViewById(R.id.folder_item_menu);
+            this.newTaskTextEdit = itemView.findViewById(R.id.folder_item_textinputlayout_edittext);
+
+            // New task listener
+            newTaskTextEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        String text = v.getText().toString();
+                        databaseManager.writeTask(folderId, new Task(text, Calendar.getInstance().getTime(), null));
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            // To make sure enters are captured.
+            newTaskTextEdit.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View view, int keyCode, KeyEvent keyevent) {
+                    if ((keyevent.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                        String text = ((TextView) view).getText().toString();
+                        databaseManager.writeTask(folderId, new Task(text, Calendar.getInstance().getTime(), null));
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
+        /**
+         * Setter for the folderId.
+         *
+         * @param folderId folderId where the textedit is located.
+         */
+        public void setFolderId(String folderId) {
+            this.folderId = folderId;
         }
     }
 }

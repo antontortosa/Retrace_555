@@ -6,7 +6,7 @@
     android:layout_marginStart="5dp">
 
     <TextView
-        android:id="@+id/item_folder_title"
+        android:id="@+id/folder_item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceLarge"
@@ -14,36 +14,39 @@
 
     <!-- TODO: replace with proper icon -->
     <TextView
-        android:id="@+id/item_folder_menu"
+        android:id="@+id/folder_item_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="10dp"
-        android:text="&#8942;"
+        android:text="@string/three_menu_dots"
         android:textAppearance="?android:textAppearanceLarge" />
 
     <ListView
-        android:id="@+id/item_folder_tasks"
+        android:id="@+id/folder_item_tasks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/item_folder_title"
+        android:layout_below="@id/folder_item_title"
         android:drawSelectorOnTop="false"
         android:textAppearance="?android:textAppearanceMedium"
-        tools:listitem="@layout/task_item">
-    </ListView>
+        tools:listitem="@layout/task_item"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/folder_item_textinputlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/item_folder_tasks">
+        android:layout_below="@+id/folder_item_tasks">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/folder_item_textinputlayout_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/task_item_textSize"
-            android:hint="@string/folder_item_newtask" />
+            android:hint="@string/folder_item_newtask"
+            android:inputType="text|textAutoCorrect"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:textSize="@dimen/task_item_textSize" />
     </android.support.design.widget.TextInputLayout>
 
 

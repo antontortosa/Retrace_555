@@ -2,6 +2,7 @@ package com.main.retrace.retrace.supportClasses;
 
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +32,15 @@ public class DatabaseManager {
      */
     private Home home;
 
+    /**
+     * Reference to folders.
+     */
     private HashMap<String, Folder> folders;
+
+    /**
+     * Reference to the user.
+     */
+    private FirebaseUser user;
 
     private final static String USER_CHILDNAME = "users";
     private final static String FOLDER_CHILDNAME = "folders";
@@ -40,18 +49,25 @@ public class DatabaseManager {
     private final static String FOLDER_KEY_TITLE = "title";
     private final static String FOLDER_KEY_LOCATION = "location";
 
-    public DatabaseManager(final String userId, HashMap<String, Folder> folders, final Home home) {
+    /**
+     * Default glorious constructor for the king of the databases. Folders is constructed but it is empty until it gets the data from the database (it is not instantaneous).
+     *
+     * @param home reference to home activity.
+     */
+    public DatabaseManager(final Home home) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        this.folders = folders;
+        this.folders = new HashMap<String, Folder>();
         this.home = home;
+        this.user = home.getUser();
+
 
         // Build reference to simplify code later on.
-        folderReference = databaseReference.child(FOLDER_CHILDNAME).child(userId);
+        folderReference = databaseReference.child(FOLDER_CHILDNAME).child(user.getUid());
 
         ValueEventListener foldersListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("DB", "Data Changed, elements: " +dataSnapshot.getChildrenCount());
+                Log.d("DB", "Data Changed, elements: " + dataSnapshot.getChildrenCount());
 
                 for (DataSnapshot folderSnapshot : dataSnapshot.getChildren()) {
                     getFolders().put(folderSnapshot.getKey(), folderSnapshot.getValue(Folder.class));
@@ -69,44 +85,94 @@ public class DatabaseManager {
     }
 
     /**
-     * Creates a new folder.
+     * Creates a new folder. Use only to manually insert data.
      *
-     * @param userId for who the folder is created.
+     * @param userId of the desired user.
      * @param title  of the folder.
      * @return the folderId.
      */
     public String writeFolder(String userId, String title, LatLngCus location) {
-        String folderId = folderReference.push().getKey();
-        folderReference.child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
-        folderReference.child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
+        String folderId = databaseReference.child(FOLDER_CHILDNAME).child(userId).push().getKey();
+        databaseReference.child(FOLDER_CHILDNAME).child(userId).child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
+        databaseReference.child(FOLDER_CHILDNAME).child(userId).child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
         return folderId;
     }
 
     /**
-     * This method adds a task to the database.
+     * Creates a new folder into the user that it is currently logged in.
      *
-     * @param task the new task.
+     * @param title of the folder.
+     */
+    public void writeFolder(String title, LatLngCus location) {
+        String folderId = databaseReference.child(FOLDER_CHILDNAME).child(user.getUid()).push().getKey();
+        folderReference.child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
+        folderReference.child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
+        Log.d("DatabaseManager | Folder", "New folder created: " + title + ", id: " + folderId);
+    }
+
+    /**
+     * This method adds a task to the database. Use only to manually insert data into a specific user/folder.
+     *
+     * @param userId of the user to add the tasks to.
+     * @param task   the new task.
      * @return the taskId.
      */
     public String writeTask(String userId, String folderId, Task task) {
-        String taskId = folderReference.child(folderId).child(TASK_CHILDNAME).push().getKey();
-        folderReference.child(folderId).child(TASK_CHILDNAME).child(taskId).setValue(task);
+        String taskId = databaseReference.child(FOLDER_CHILDNAME).child(userId).child(folderId).child(TASK_CHILDNAME).push().getKey();
+        databaseReference.child(FOLDER_CHILDNAME).child(userId).child(folderId).child(TASK_CHILDNAME).child(taskId).setValue(task);
         return taskId;
     }
 
     /**
-     * This method creates a new user.
+     * This method adds a task to the database into the user that it is currently logged in.
+     *
+     * @param task the new task.
+     */
+    public void writeTask(String folderId, Task task) {
+        String taskId = databaseReference.child(FOLDER_CHILDNAME).child(user.getUid()).child(folderId).child(TASK_CHILDNAME).push().getKey();
+        folderReference.child(folderId).child(TASK_CHILDNAME).child(taskId).setValue(task);
+        Log.d("DatabaseManager | Task", "New task created: " + task.getName() + ", id: " + taskId);
+    }
+
+    /**
+     * This method removes the task.
+     *
+     * @param folderId of the folder where the task is.
+     * @param taskId   of the task to remove.
+     */
+    public void removeTask(String folderId, String taskId) {
+        folderReference.child(folderId).child(TASK_CHILDNAME).child(taskId).removeValue();
+        Log.d("DatabaseManager | Task", "Task removed, id: " + taskId);
+    }
+
+    /**
+     * Deprecated because the table has changed. This method creates a new user. Should only be used for testing.
      *
      * @param user the new user.
      * @return the userId.
      */
-    public String writeUser(User user) {
+    @Deprecated
+    private String writeUser(User user) {
         String userId = databaseReference.child(USER_CHILDNAME).push().getKey();
         databaseReference.child(USER_CHILDNAME).child(userId).setValue(user);
         return userId;
     }
 
+    /**
+     * Getter for the folders.
+     *
+     * @return the folders.
+     */
     public HashMap<String, Folder> getFolders() {
         return folders;
+    }
+
+    /**
+     * Setter for the folders.
+     *
+     * @param folders the new folders.
+     */
+    public void setFolders(HashMap<String, Folder> folders) {
+        this.folders = folders;
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
@@ -13,7 +14,7 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/nav_imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/nav_header_desc"
@@ -23,12 +24,13 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/nav_userTextview"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/nav_header_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        tools:text="@string/nav_header_title" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/nav_emailTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/nav_header_subtitle" />
