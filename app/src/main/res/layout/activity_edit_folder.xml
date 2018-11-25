@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditFolderActivity"
+    tools:layout_editor_absoluteY="81dp">
+
+    <TextView
+        android:id="@+id/folderNameView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="2dp"
+        android:text="@string/folder_new_name"
+        app:layout_constraintBottom_toTopOf="@+id/folderNameEdit"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/folderNameView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/folder_location"
+        app:layout_constraintBottom_toTopOf="@+id/addLocation"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/folderNameEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="37dp"
+        android:layout_marginBottom="27dp"
+        android:ems="10"
+        android:hint="New Name"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/addLocation"
+        app:layout_constraintStart_toStartOf="@+id/folderNameView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:onClick="saveFolder"
+        android:text="@string/folder_save_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addLocation" />
+
+    <TextView
+        android:id="@+id/addLocation"
+        android:layout_width="266dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="313dp"
+        android:text="@string/folder_add_location"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSave"
+        app:layout_constraintStart_toStartOf="@+id/folderNameView2"
+        app:layout_constraintTop_toBottomOf="@+id/folderNameEdit" />
+
+</android.support.constraint.ConstraintLayout>

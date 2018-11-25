@@ -56,7 +56,7 @@ public class DatabaseManager {
      */
     public DatabaseManager(final Home home) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        this.folders = new HashMap<String, Folder>();
+        this.folders = folders;
         this.home = home;
         this.user = home.getUser();
 
