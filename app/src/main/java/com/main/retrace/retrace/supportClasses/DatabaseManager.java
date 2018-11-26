@@ -17,37 +17,31 @@ import java.util.HashMap;
  */
 public class DatabaseManager {
 
+    private final static String USER_CHILDNAME = "users";
+    private final static String FOLDER_CHILDNAME = "folders";
+    private final static String TASK_CHILDNAME = "tasks";
+    private final static String FOLDER_KEY_TITLE = "title";
+    private final static String FOLDER_KEY_LOCATION = "location";
     /**
      * Reference to the database.
      */
     private DatabaseReference databaseReference;
-
     /**
      * Direct reference to the folders of the user.
      */
     private DatabaseReference folderReference;
-
     /**
      * Reference to home.
      */
     private Home home;
-
     /**
      * Reference to folders.
      */
     private HashMap<String, Folder> folders;
-
     /**
      * Reference to the user.
      */
     private FirebaseUser user;
-
-    private final static String USER_CHILDNAME = "users";
-    private final static String FOLDER_CHILDNAME = "folders";
-    private final static String TASK_CHILDNAME = "tasks";
-
-    private final static String FOLDER_KEY_TITLE = "title";
-    private final static String FOLDER_KEY_LOCATION = "location";
 
     /**
      * Default glorious constructor for the king of the databases. Folders is constructed but it is empty until it gets the data from the database (it is not instantaneous).

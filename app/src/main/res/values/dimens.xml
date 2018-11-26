@@ -6,6 +6,7 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="task_item_textSize">15sp</dimen>
+    <dimen name="nav_menu_item_textSize">15sp</dimen>
 
     <!-- Signup -->
     <dimen name="logo_w_h">100dp</dimen>

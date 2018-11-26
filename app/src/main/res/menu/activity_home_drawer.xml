@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-
     <group
         android:id="@+id/lazy_group"
         android:checkableBehavior="single">
@@ -38,7 +37,6 @@
             android:id="@+id/nav_about"
             android:title="@string/nav_drawer_about" />
     </group>
-
 
 
 </menu>

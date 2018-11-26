@@ -43,6 +43,7 @@ import com.main.retrace.retrace.supportClasses.LatLngCus;
 import com.main.retrace.retrace.supportClasses.Task;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     /**
      * Adapter for the RecyclerView.
      */
-    private FolderAdapter mAdapter;
+    private FolderAdapter mFolderAdapter;
 
     /**
      * LinearLayoutManager for the RecyclerView.
@@ -93,9 +94,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private LatLngCus LKL;
 
     /**
-     * Drawer Menu items <Folder title,Item id>
+     * Actual (probably old= Menu items <Folder title,Item id>
      */
-    private HashMap<String,Integer> menuItems;
+    private ArrayList<Integer> menuItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,11 +128,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Move to create folder activity
+                // Move to create folder activity
                 Intent i = new Intent(Home.this, EditFolderActivity.class);
                 startActivity(i);
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
             }
         });
 
@@ -183,7 +182,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             populateDatabase("bNaSdXkbmzQ7tRsRDizZ11pUorx1");
         }
 
-        menuItems = new HashMap<String,Integer>();
+        menuItems = new ArrayList<Integer>();
 
         // Remember that onResume is also executed after this.
     }
@@ -193,6 +192,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         super.onResume();
 
         checkIntent();
+        populateNavView();
     }
 
     @Override
@@ -326,10 +326,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 auxfolders.put(x, dbManager.getFolders().get(x));
             }
             // specify an adapter (see also next example), we couldn't do this because the data wasn't loaded.
-            mAdapter = new FolderAdapter(dbManager, getApplicationContext());
+            mFolderAdapter = new FolderAdapter(dbManager, getApplicationContext());
             // Setting folders ordered.
-            mAdapter.setmFolderData(auxfolders);
-            mFoldersRecyclerView.setAdapter(mAdapter);
+            // TODO: only DatabaseManager folders should be changed?
+            mFolderAdapter.setmFolderData(auxfolders);
+            mFoldersRecyclerView.setAdapter(mFolderAdapter);
+
             populateNavView();
         }
     }
@@ -344,20 +346,33 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
         MenuItem aux_menu;
-        for (Folder f : folders_linked.values()) {
-            if(!menuItems.containsKey(f.getTitle())) {
-                getLastLocation();
-                aux_menu = menu.add(R.id.lazy_group, Menu.NONE, calculateOrder(f.getLocation()), f.getTitle());
-                aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        //TODO
-                        //Intent to folder view
-                        return true;
-                    }
-                });
-                menuItems.put(f.getTitle(), aux_menu.getItemId());
+
+        // Clear the menu if it has something.
+        if (menuItems.size() > 0) {
+            for (Integer id : menuItems) {
+                menu.removeItem(id);
             }
+        }
+
+        int i = 0;
+        for (Map.Entry<String, Folder> entry : folders_linked.entrySet()) {
+            String folderId = entry.getKey();
+            Folder folder = entry.getValue();
+
+            getLastLocation();
+
+            aux_menu = menu.add(R.id.lazy_group, i, calculateOrder(folder.getLocation()), folder.getTitle());
+            aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    //TODO: Intent to folder view
+                    return true;
+                }
+            });
+
+            // We need to keep track of what is inside so:
+            menuItems.add(i);
+            i++;
         }
     }
 

@@ -16,11 +16,6 @@ public class LatLngCus {
      */
     private Double longitude;
 
-    /*
-    * Name of the location
-    * */
-    private String name;
-
     /**
      * Empty constructor for Firebase.
      */
@@ -42,8 +37,16 @@ public class LatLngCus {
         return latitude;
     }
 
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
     public Double getLongitude() {
         return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     /**
@@ -54,16 +57,4 @@ public class LatLngCus {
     public LatLng getLatLng() {
         return new com.google.android.gms.maps.model.LatLng(latitude, longitude);
     }
-
-    public String getName(){ return this.name; }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public void setName(String name) { this.name = name; }
 }

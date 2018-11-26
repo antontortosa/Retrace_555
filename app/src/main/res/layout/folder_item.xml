@@ -30,7 +30,7 @@
         android:layout_below="@id/folder_item_title"
         android:drawSelectorOnTop="false"
         android:textAppearance="?android:textAppearanceMedium"
-        tools:listitem="@layout/task_item"/>
+        tools:listitem="@layout/task_item" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/folder_item_textinputlayout"
@@ -43,8 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/folder_item_newtask"
-            android:inputType="text|textAutoCorrect"
             android:imeOptions="actionDone"
+            android:inputType="text|textAutoCorrect"
             android:maxLines="1"
             android:textSize="@dimen/task_item_textSize" />
     </android.support.design.widget.TextInputLayout>
