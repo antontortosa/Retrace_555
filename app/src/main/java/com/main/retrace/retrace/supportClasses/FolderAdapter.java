@@ -1,6 +1,7 @@
 package com.main.retrace.retrace.supportClasses;
 
 import android.content.Context;
+import android.content.Intent;
 import android.icu.util.Calendar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,8 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.main.retrace.retrace.EditFolderActivity;
+import com.main.retrace.retrace.Home;
 import com.main.retrace.retrace.R;
 
 import java.util.ArrayList;
@@ -93,12 +96,20 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
                         switch (item.getItemId()) {
                             case R.id.folder_menu_open:
                                 //handle menu1 click
+                                //TODO: folder menu open create.
                                 break;
                             case R.id.folder_menu_edit:
-                                //handle menu2 click
+                                Intent intent = new Intent(context, EditFolderActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra("FolderId", folderId);
+                                intent.putExtra("FolderName", folder.getTitle());
+                                intent.putExtra("Lat", folder.getLocation().getLatitude());
+                                intent.putExtra("Long", folder.getLocation().getLongitude());
+                                context.startActivity(intent);
                                 break;
                             case R.id.folder_menu_delete:
                                 //handle menu3 click
+                                databaseManager.removeFolder(folderId);
                                 break;
                         }
                         return false;
@@ -112,28 +123,32 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
 
         holder.setFolderId(folderId);
 
-        TaskAdapter taskAdapter = new TaskAdapter(databaseManager, folderId, context);
+        // Before creating the TaskAdapter let's check if there are any tasks.
+        if (databaseManager.getFolders().get(folderId).getTasks() != null) {
+            TaskAdapter taskAdapter = new TaskAdapter(databaseManager, folderId, context);
 
-        holder.tasks.setAdapter(taskAdapter);
+            holder.tasks.setAdapter(taskAdapter);
 
-        // To get the right height of the ListView.
-        int totalHeight = 0;
-        for (int i = 0; i < holder.tasks.getCount(); i++) {
-            View listItem = taskAdapter.getView(i, null, holder.tasks);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = holder.tasks.getLayoutParams();
-        params.height = totalHeight + (holder.tasks.getDividerHeight() * (taskAdapter.getCount() - 1));
-        holder.tasks.setLayoutParams(params);
-        holder.tasks.requestLayout();
 
-        holder.tasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO
+            // To get the right height of the ListView.
+            int totalHeight = 0;
+            for (int i = 0; i < holder.tasks.getCount(); i++) {
+                View listItem = taskAdapter.getView(i, null, holder.tasks);
+                listItem.measure(0, 0);
+                totalHeight += listItem.getMeasuredHeight();
             }
-        });
+            ViewGroup.LayoutParams params = holder.tasks.getLayoutParams();
+            params.height = totalHeight + (holder.tasks.getDividerHeight() * (taskAdapter.getCount() - 1));
+            holder.tasks.setLayoutParams(params);
+            holder.tasks.requestLayout();
+
+            holder.tasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // TODO
+                }
+            });
+        }
     }
 
     /**
@@ -142,6 +157,15 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
     @Override
     public int getItemCount() {
         return mFolderData.size();
+    }
+
+    /**
+     * Setter for the folders.
+     *
+     * @param mFolderData
+     */
+    public void setmFolderData(LinkedHashMap<String, Folder> mFolderData) {
+        this.mFolderData = mFolderData;
     }
 
     // Provide a reference to the views for each data item

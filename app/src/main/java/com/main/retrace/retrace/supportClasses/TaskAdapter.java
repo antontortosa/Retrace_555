@@ -4,20 +4,19 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 import com.main.retrace.retrace.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
  * This class is the TaskAdapter.
  */
-public class TaskAdapter extends ArrayAdapter<Task> {
+public class TaskAdapter extends BaseAdapter {
     /**
      * Reference to the DatabaseManager.
      */
@@ -31,7 +30,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
     /**
      * Tasks.
      */
-    private HashMap<String, Task> tasks;
+    private LinkedHashMap<String, Task> tasks;
 
     /**
      * Reference to the context.
@@ -50,7 +49,6 @@ public class TaskAdapter extends ArrayAdapter<Task> {
      * @param context         context of the app.
      */
     public TaskAdapter(DatabaseManager databaseManager, String folderId, Context context) {
-        super(context, R.layout.task_item, new ArrayList<Task>(databaseManager.getFolders().get(folderId).getTasks().values()));
         this.tasks = new LinkedHashMap<String, Task>(databaseManager.getFolders().get(folderId).getTasks());
         this.databaseManager = databaseManager;
         this.folderId = folderId;
@@ -69,7 +67,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         if (convertView == null) {
 
             viewHolder = new MyTaskViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
+            LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(R.layout.task_item, parent, false);
             viewHolder.mCheckBox = convertView.findViewById(R.id.task_item_checkBox);
 
@@ -92,6 +90,38 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    /**
+     * Returns the item.
+     *
+     * @param position of the item to return.
+     * @return the Task.
+     */
+    @Override
+    public Task getItem(int position) {
+        return new ArrayList<Task>(tasks.values()).get(position);
+    }
+
+    /**
+     * Return the id.
+     *
+     * @param i position.
+     * @return the position.
+     */
+    @Override
+    public long getItemId(int i) {
+        return lastPosition;
+    }
+
+    /**
+     * Returns the number of tasks.
+     *
+     * @return the number of tasks.
+     */
+    @Override
+    public int getCount() {
+        return tasks.size();
     }
 
     /**

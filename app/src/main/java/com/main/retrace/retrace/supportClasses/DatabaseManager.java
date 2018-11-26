@@ -56,10 +56,11 @@ public class DatabaseManager {
      */
     public DatabaseManager(final Home home) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        this.folders = folders;
         this.home = home;
         this.user = home.getUser();
 
+        // Construct folders
+        folders = new HashMap<String, Folder>();
 
         // Build reference to simplify code later on.
         folderReference = databaseReference.child(FOLDER_CHILDNAME).child(user.getUid());
@@ -69,8 +70,12 @@ public class DatabaseManager {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d("DB", "Data Changed, elements: " + dataSnapshot.getChildrenCount());
 
+                // We clear it to make sure we only have updated data.
+                folders.clear();
+
                 for (DataSnapshot folderSnapshot : dataSnapshot.getChildren()) {
-                    getFolders().put(folderSnapshot.getKey(), folderSnapshot.getValue(Folder.class));
+
+                    folders.put(folderSnapshot.getKey(), folderSnapshot.getValue(Folder.class));
                 }
                 home.showProgress(false);
             }
@@ -108,6 +113,29 @@ public class DatabaseManager {
         folderReference.child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
         folderReference.child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
         Log.d("DatabaseManager | Folder", "New folder created: " + title + ", id: " + folderId);
+    }
+
+    /**
+     * This method edits an existing folder.
+     *
+     * @param folderId of the existing folder.
+     * @param title    the new title.
+     * @param location the new location.
+     */
+    public void editFolder(String folderId, String title, LatLngCus location) {
+        folderReference.child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
+        folderReference.child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
+        Log.d("DatabaseManager | Folder", "Folder edited: " + title + ", id: " + folderId);
+    }
+
+    /**
+     * This method removes a folder.
+     *
+     * @param folderId of the folder to remove.
+     */
+    public void removeFolder(String folderId) {
+        folderReference.child(folderId).removeValue();
+        Log.d("DatabaseManager | Folder", "Folder removed, id: " + folderId);
     }
 
     /**
