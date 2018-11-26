@@ -11,7 +11,7 @@
     <group
         android:id="@+id/menu_top"
         android:checkableBehavior="single"
-        android:orderInCategory="998">
+        android:orderInCategory="2147483646">
         <item
             android:id="@+id/nav_unplaced"
             android:icon="@drawable/not_placeholder"
@@ -25,7 +25,7 @@
     <group
         android:id="@+id/menu_bottom"
         android:checkableBehavior="single"
-        android:orderInCategory="999">
+        android:orderInCategory="2147483647">
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/settings"

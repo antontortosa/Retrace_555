@@ -122,7 +122,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         FloatingActionButton fab = findViewById(R.id.add_folder);
         mFusedLocationClient = getFusedLocationProviderClient(this);
         //FIX POSITION FOR TESTING
-        LKL = new LatLngCus(41.925017, -87.659908);
+        LKL = new LatLngCus(41.83508485, -87.62759632174277);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -366,9 +366,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         if (location != null && LKL != null) {
             distance = SphericalUtil.computeDistanceBetween(location.getLatLng(), LKL.getLatLng());
         } else {
-            distance = 997;
+            distance = 2147483644;
         }
-        return (int) distance % 999;
+        return (int)distance;
     }
 
     public void onLocationChanged(Location location) {
