@@ -20,6 +20,7 @@ public class Folder {
      * HashMap with the tasks
      */
     private HashMap<String, Task> tasks;
+
     /**
      * Empty constructor for FireBase compatibility.
      */

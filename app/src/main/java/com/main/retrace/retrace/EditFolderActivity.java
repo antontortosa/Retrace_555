@@ -9,18 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.main.retrace.retrace.supportClasses.LatLngCus;
 
 public class EditFolderActivity extends AppCompatActivity {
@@ -48,6 +41,29 @@ public class EditFolderActivity extends AppCompatActivity {
     private String folderId;
 
     private int PLACE_PICKER_REQUEST = 1;
+    private TextWatcher filterTextWatcher = new TextWatcher() {
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // DO THE CALCULATIONS HERE AND SHOW THE RESULT AS PER YOUR CALCULATIONS
+            if (!s.toString().equals("")) {
+                //TODO: Check if the folder name is already in use
+                saveButton.setEnabled(true);
+            }
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +88,8 @@ public class EditFolderActivity extends AppCompatActivity {
     }
 
     public void saveFolder(View view) {
-        if(location==null){
-            location = new LatLngCus(41.83367895,-87.62833922405937);
+        if (location == null) {
+            location = new LatLngCus(41.83367895, -87.62833922405937);
         }
         //Save folder and go back
         Intent i = new Intent(EditFolderActivity.this, Home.class);
@@ -82,6 +98,8 @@ public class EditFolderActivity extends AppCompatActivity {
         i.putExtra("Lat", location.getLatitude());
         i.putExtra("Long", location.getLongitude());
         startActivity(i);
+
+        // TODO: finish activity to remove of it from the stack?
     }
 
     public void setLocation(View view) throws GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
@@ -95,36 +113,10 @@ public class EditFolderActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(this,data);
-                location = new LatLngCus(place.getLatLng().latitude,place.getLatLng().longitude);
+                Place place = PlacePicker.getPlace(this, data);
+                location = new LatLngCus(place.getLatLng().latitude, place.getLatLng().longitude);
                 addLocation.setText(location.getLatitude() + "," + location.getLongitude());
             }
         }
     }
-
-
-
-    private TextWatcher filterTextWatcher = new TextWatcher() {
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // DO THE CALCULATIONS HERE AND SHOW THE RESULT AS PER YOUR CALCULATIONS
-            if (!s.toString().equals("")) {
-                //TODO: Check if the folder name is already in use
-                saveButton.setEnabled(true);
-            }
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-        }
-
-
-    };
 }

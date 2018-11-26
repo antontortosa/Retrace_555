@@ -17,7 +17,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.main.retrace.retrace.EditFolderActivity;
-import com.main.retrace.retrace.Home;
 import com.main.retrace.retrace.R;
 
 import java.util.ArrayList;
