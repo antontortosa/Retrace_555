@@ -92,6 +92,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      */
     private LatLngCus LKL;
 
+    /**
+     * Drawer Menu items <Folder title,Item id>
+     */
+    private HashMap<String,Integer> menuItems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,6 +182,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             dbManager.setFolders(folders);
             populateDatabase("bNaSdXkbmzQ7tRsRDizZ11pUorx1");
         }
+
+        menuItems = new HashMap<String,Integer>();
 
         // Remember that onResume is also executed after this.
     }
@@ -332,21 +339,25 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void populateNavView() {
+
         LinkedHashMap<String, Folder> folders_linked = new LinkedHashMap<String, Folder>(dbManager.getFolders());
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
         MenuItem aux_menu;
         for (Folder f : folders_linked.values()) {
-            getLastLocation();
-            aux_menu = menu.add(R.id.lazy_group, Menu.NONE, calculateOrder(f.getLocation()), f.getTitle());
-            aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    //TODO
-                    //Intent to folder view
-                    return true;
-                }
-            });
+            if(!menuItems.containsKey(f.getTitle())) {
+                getLastLocation();
+                aux_menu = menu.add(R.id.lazy_group, Menu.NONE, calculateOrder(f.getLocation()), f.getTitle());
+                aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        //TODO
+                        //Intent to folder view
+                        return true;
+                    }
+                });
+                menuItems.put(f.getTitle(), aux_menu.getItemId());
+            }
         }
     }
 

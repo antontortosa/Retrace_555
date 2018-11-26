@@ -134,6 +134,7 @@ public class DatabaseManager {
      * @param folderId of the folder to remove.
      */
     public void removeFolder(String folderId) {
+
         folderReference.child(folderId).removeValue();
         Log.d("DatabaseManager | Folder", "Folder removed, id: " + folderId);
     }

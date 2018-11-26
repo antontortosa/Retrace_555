@@ -12,10 +12,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginTop="17dp"
         android:text="@string/folder_new_name"
-        app:layout_constraintBottom_toTopOf="@+id/folderNameEdit"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/folderNameView2"
@@ -53,12 +53,26 @@
 
     <TextView
         android:id="@+id/addLocation"
-        android:layout_width="266dp"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="313dp"
-        android:text="@string/folder_add_location"
+        android:hint="@string/folder_add_location"
         app:layout_constraintBottom_toTopOf="@+id/buttonSave"
-        app:layout_constraintStart_toStartOf="@+id/folderNameView2"
+        app:layout_constraintEnd_toStartOf="@+id/add_location_btn"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/folderNameEdit" />
+
+    <ImageView
+        android:id="@+id/add_location_btn"
+        android:layout_width="44dp"
+        android:layout_height="33dp"
+        android:layout_marginEnd="45dp"
+        android:onClick="setLocation"
+        app:layout_constraintBottom_toBottomOf="@+id/addLocation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addLocation"
+        app:layout_constraintTop_toTopOf="@+id/addLocation"
+        app:srcCompat="@drawable/next" />
 
 </android.support.constraint.ConstraintLayout>

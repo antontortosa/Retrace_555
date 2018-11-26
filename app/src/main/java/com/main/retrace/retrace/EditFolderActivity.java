@@ -9,7 +9,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.main.retrace.retrace.supportClasses.LatLngCus;
 
 public class EditFolderActivity extends AppCompatActivity {
@@ -18,6 +29,11 @@ public class EditFolderActivity extends AppCompatActivity {
      * Reference to the EditText with the folder name.
      */
     private EditText editTextFolderName;
+
+    /**
+     * Reference to the TextView with the folder location.
+     */
+    private TextView addLocation;
     /**
      * Reference to the location.
      */
@@ -31,6 +47,8 @@ public class EditFolderActivity extends AppCompatActivity {
      */
     private String folderId;
 
+    private int PLACE_PICKER_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +57,7 @@ public class EditFolderActivity extends AppCompatActivity {
         editTextFolderName.addTextChangedListener(filterTextWatcher);
         saveButton = findViewById(R.id.buttonSave);
         saveButton.setEnabled(false);
+        addLocation = findViewById(R.id.addLocation);
 
         // Let's check if this comes from an already existing folder.
         Intent intent = getIntent();
@@ -47,18 +66,43 @@ public class EditFolderActivity extends AppCompatActivity {
             editTextFolderName.setText(folderName, TextView.BufferType.EDITABLE);
             folderId = intent.getStringExtra("FolderId");
             location = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0));
+            addLocation.setText(location.getLatitude() + "," + location.getLongitude());
+
         }
     }
 
     public void saveFolder(View view) {
+        if(location==null){
+            location = new LatLngCus(41.83367895,-87.62833922405937);
+        }
         //Save folder and go back
         Intent i = new Intent(EditFolderActivity.this, Home.class);
         i.putExtra("FolderName", editTextFolderName.getText().toString());
         i.putExtra("FolderId", folderId);
-        i.putExtra("Lat", 41.8789);
-        i.putExtra("Long", -87.6358);
+        i.putExtra("Lat", location.getLatitude());
+        i.putExtra("Long", location.getLongitude());
         startActivity(i);
     }
+
+    public void setLocation(View view) throws GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
+
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+        startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(this,data);
+                location = new LatLngCus(place.getLatLng().latitude,place.getLatLng().longitude);
+                addLocation.setText(location.getLatitude() + "," + location.getLongitude());
+            }
+        }
+    }
+
+
 
     private TextWatcher filterTextWatcher = new TextWatcher() {
 
@@ -66,6 +110,7 @@ public class EditFolderActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             // DO THE CALCULATIONS HERE AND SHOW THE RESULT AS PER YOUR CALCULATIONS
             if (!s.toString().equals("")) {
+                //TODO: Check if the folder name is already in use
                 saveButton.setEnabled(true);
             }
         }
@@ -79,5 +124,7 @@ public class EditFolderActivity extends AppCompatActivity {
         public void afterTextChanged(Editable s) {
 
         }
+
+
     };
 }
