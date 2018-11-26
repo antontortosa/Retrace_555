@@ -1,6 +1,5 @@
 package com.main.retrace.retrace.supportClasses;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -33,18 +32,19 @@ public class Task {
     private Date completionDate;
 
     /**
-     * Empty constructor for Firebase compatibility.
+     * Empty constructor for FireBase compatibility.
      */
-    public Task() {}
+    public Task() {
+    }
 
     /**
-     * Constructor with all parameters for Firebase compatibility.
+     * Constructor with all the parameters for FireBase compatibility.
      *
-     * @param name
-     * @param done
-     * @param creationDate
-     * @param dueDate
-     * @param completionDate
+     * @param name           of the task.
+     * @param done           is the task completed?
+     * @param creationDate   of the task.
+     * @param dueDate        of the task.
+     * @param completionDate of the task.
      */
     public Task(String name, Boolean done, Date creationDate, Date dueDate, Date completionDate) {
         this.name = name;

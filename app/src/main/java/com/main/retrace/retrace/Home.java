@@ -4,12 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -23,39 +24,34 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.location.Location;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.maps.android.SphericalUtil;
+import com.main.retrace.retrace.supportClasses.CircleTransform;
 import com.main.retrace.retrace.supportClasses.DatabaseManager;
 import com.main.retrace.retrace.supportClasses.Folder;
 import com.main.retrace.retrace.supportClasses.FolderAdapter;
 import com.main.retrace.retrace.supportClasses.LatLngCus;
 import com.main.retrace.retrace.supportClasses.Task;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.google.maps.android.SphericalUtil;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    /**
-     * Stores the folders.
-     */
-    private HashMap<String, Folder> folders;
-
     /**
      * RecyclerView for the folders.
      */
@@ -64,7 +60,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     /**
      * Adapter for the RecyclerView.
      */
-    private RecyclerView.Adapter mAdapter;
+    private FolderAdapter mAdapter;
 
     /**
      * LinearLayoutManager for the RecyclerView.
@@ -82,29 +78,47 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private DatabaseManager dbManager;
 
     /**
+     * Reference to the user.
+     */
+    private FirebaseUser user;
+
+    /**
      * Location client
-     * */
+     */
     private FusedLocationProviderClient mFusedLocationClient;
 
     /**
      * Last Known Location
-     * */
+     */
     private LatLngCus LKL;
-
-    private final static String userId = "-LRdRidR3LUhzN_xSTcT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        // Receiving user info after login
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // User is signed in
+            Log.d("Login", "User info received correctly at the Home Activity.");
+            this.user = user;
+        } else {
+            // No user is signed in
+            Log.d("Login", "User shouldn't be here without logging in first. ");
+            finish();
+        }
+
+        dbManager = new DatabaseManager(this);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        FloatingActionButton fab = findViewById(R.id.add_folder);
         mFusedLocationClient = getFusedLocationProviderClient(this);
         //FIX POSITION FOR TESTING
-        LKL = new LatLngCus(41.925017,-87.659908);
+        LKL = new LatLngCus(41.925017, -87.659908);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_folder);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,14 +139,30 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Set user name & profile picture
+        View headerView = navigationView.getHeaderView(0);
+        ImageView imageView = headerView.findViewById(R.id.nav_imageView);
+        Drawable imageDrawable = imageView.getDrawable();
+
+        Picasso.with(Home.this)
+                .load(user.getPhotoUrl())
+                .placeholder(imageDrawable)
+                .resize(100, 100)
+                .centerCrop()
+                .transform(new CircleTransform())
+                .into(imageView);
+
+        ((TextView) headerView.findViewById(R.id.nav_userTextview)).setText(user.getDisplayName());
+        ((TextView) headerView.findViewById(R.id.nav_emailTextView)).setText(user.getEmail());
+
         // Progress view setup.
         mProgressView = findViewById(R.id.loading_progress);
 
         // Recycle view setup.
-        mFoldersRecyclerView = (RecyclerView) findViewById(R.id.folders_recycler_view);
+        mFoldersRecyclerView = findViewById(R.id.folders_recycler_view);
         mFoldersRecyclerView.setVisibility(View.GONE);
 
-        // use a linear layout manager
+        // Use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mFoldersRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -143,18 +173,24 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         final boolean databaseEmpty = false;
         if (databaseEmpty) {
             Log.d("DB", "Creating faking content for the Database.");
-            folders = fakeContentCreator();
-            dbManager = new DatabaseManager(userId, folders, this);
-            populateDatabase();
-        } else {
-            folders = new HashMap<String, Folder>();
-            dbManager = new DatabaseManager(userId, folders, this);
+            HashMap<String, Folder> folders = fakeContentCreator();
+            dbManager.setFolders(folders);
+            populateDatabase("bNaSdXkbmzQ7tRsRDizZ11pUorx1");
         }
+
+        // Remember that onResume is also executed after this.
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        checkIntent();
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -189,10 +225,18 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         } else if (id == R.id.nav_logout) {
             // Log out from app
-
+            AuthUI.getInstance()
+                    .signOut(this)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                            Log.d("Login", "User logged out correctly, redirecting to log in.");
+                            startActivity(new Intent(Home.this, LoginActivity.class));
+                        }
+                    });
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -220,16 +264,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     /**
-     * Populates the database with the folders.
+     * Triggers the update of the database so it is updated with the value of the folders attribute.
      */
-    private void populateDatabase() {
-        Iterator<String> folderIterator = folders.keySet().iterator();
-        while (folderIterator.hasNext()) {
-            Folder folder = folders.get(folderIterator.next());
+    private void populateDatabase(String userId) {
+        for (String s : dbManager.getFolders().keySet()) {
+            Folder folder = dbManager.getFolders().get(s);
             String folderId = dbManager.writeFolder(userId, folder.getTitle(), folder.getLocation());
-            Iterator<String> taskIterator = folder.getTasks().keySet().iterator();
-            while (taskIterator.hasNext()) {
-                dbManager.writeTask(userId, folderId, folder.getTasks().get(taskIterator.next()));
+            for (String s1 : folder.getTasks().keySet()) {
+                dbManager.writeTask(userId, folderId, folder.getTasks().get(s1));
             }
         }
     }
@@ -259,13 +301,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
 
         if (!show) {
-            LinkedHashMap<String,Folder> auxfolders = new LinkedHashMap<String, Folder>();
+            LinkedHashMap<String, Folder> auxfolders = new LinkedHashMap<String, Folder>();
             LinkedHashMap<String, Integer> fdistances = new LinkedHashMap<String, Integer>();
             LinkedHashMap<String, Integer> ordered = new LinkedHashMap<String, Integer>();
 
             //For each entry in the folders hashmap we calculate its postition
-            for (String x : folders.keySet()) {
-                fdistances.put(x, calculateOrder(folders.get(x).getLocation()));
+            for (String x : dbManager.getFolders().keySet()) {
+                fdistances.put(x, calculateOrder(dbManager.getFolders().get(x).getLocation()));
             }
             //Reorder the folders
             fdistances.entrySet()
@@ -274,24 +316,29 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                     .forEachOrdered(x -> ordered.put(x.getKey(), x.getValue()));
             //store them ordered
             for (String x : ordered.keySet()) {
-                auxfolders.put(x,folders.get(x));
+                auxfolders.put(x, dbManager.getFolders().get(x));
             }
             // specify an adapter (see also next example), we couldn't do this because the data wasn't loaded.
-
-            mAdapter = new FolderAdapter(auxfolders, getApplicationContext());
+            mAdapter = new FolderAdapter(dbManager, getApplicationContext());
+            // Setting folders ordered.
+            mAdapter.setmFolderData(auxfolders);
             mFoldersRecyclerView.setAdapter(mAdapter);
             populateNavView();
         }
     }
 
-    private void populateNavView(){
-        LinkedHashMap<String, Folder> folders_linked = new LinkedHashMap<String, Folder>(folders);
+    public FirebaseUser getUser() {
+        return user;
+    }
+
+    private void populateNavView() {
+        LinkedHashMap<String, Folder> folders_linked = new LinkedHashMap<String, Folder>(dbManager.getFolders());
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
         MenuItem aux_menu;
-        for(Folder f : folders_linked.values()){
+        for (Folder f : folders_linked.values()) {
             getLastLocation();
-            aux_menu = menu.add(R.id.lazy_group, Menu.NONE, calculateOrder(f.getLocation()),f.getTitle());
+            aux_menu = menu.add(R.id.lazy_group, Menu.NONE, calculateOrder(f.getLocation()), f.getTitle());
             aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -303,11 +350,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
     }
 
-    public int calculateOrder(LatLngCus location){
+    public int calculateOrder(LatLngCus location) {
         double distance;
-        if(location!=null && LKL!=null){distance = SphericalUtil.computeDistanceBetween(location.getLatLng(), LKL.getLatLng());}
-        else{distance = 997;}
-        return (int)distance%999;
+        if (location != null && LKL != null) {
+            distance = SphericalUtil.computeDistanceBetween(location.getLatLng(), LKL.getLatLng());
+        } else {
+            distance = 997;
+        }
+        return (int) distance % 999;
     }
 
     public void onLocationChanged(Location location) {
@@ -322,8 +372,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     public void getLastLocation() {
         // Get last known recent location using new Google Play Services SDK (v11+)
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },0);
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
@@ -345,4 +395,22 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 });
     }
 
+    private void checkIntent() {
+        // Checking if this comes from the EditFolder Activity
+        String folderName = getIntent().getStringExtra("FolderName");
+        if (folderName != null) {
+            String folderId = getIntent().getStringExtra("FolderId");
+            // Maybe it is an edit
+            if (folderId == null) {
+                Log.d("Home", "Adding new folder after + was pressed.");
+                LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0));
+                dbManager.writeFolder(folderName, latLngCus);
+            } else {
+                // It is an edit!
+                Log.d("Home", "Editing existing folder from EditFolderActivity.");
+                LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0));
+                dbManager.editFolder(folderId, folderName, latLngCus);
+            }
+        }
+    }
 }

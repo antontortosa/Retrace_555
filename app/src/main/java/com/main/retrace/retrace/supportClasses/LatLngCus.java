@@ -25,8 +25,8 @@ public class LatLngCus {
     /**
      * Constructor with all the parameters.
      *
-     * @param latitude
-     * @param longitude
+     * @param latitude  of the location.
+     * @param longitude of the location.
      */
     public LatLngCus(Double latitude, Double longitude) {
         this.latitude = latitude;
@@ -48,5 +48,13 @@ public class LatLngCus {
      */
     public LatLng getLatLng() {
         return new com.google.android.gms.maps.model.LatLng(latitude, longitude);
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }
