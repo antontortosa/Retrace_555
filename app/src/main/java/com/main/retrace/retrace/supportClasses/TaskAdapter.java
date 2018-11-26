@@ -65,12 +65,10 @@ public class TaskAdapter extends BaseAdapter {
         MyTaskViewHolder viewHolder; // view lookup cache stored in tag
 
         if (convertView == null) {
-
             viewHolder = new MyTaskViewHolder();
             LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(R.layout.task_item, parent, false);
             viewHolder.mCheckBox = convertView.findViewById(R.id.task_item_checkBox);
-
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (MyTaskViewHolder) convertView.getTag();
