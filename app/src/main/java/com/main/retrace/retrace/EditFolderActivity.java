@@ -115,7 +115,7 @@ public class EditFolderActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
                 location = new LatLngCus(place.getLatLng().latitude, place.getLatLng().longitude);
-                addLocation.setText(location.getLatitude() + "," + location.getLongitude());
+                addLocation.setText(place.getName());
             }
         }
     }

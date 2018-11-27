@@ -353,6 +353,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 menu.removeItem(id);
             }
         }
+        menuItems.clear();
 
         int i = 0;
         for (Map.Entry<String, Folder> entry : folders_linked.entrySet()) {
