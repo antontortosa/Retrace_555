@@ -15,6 +15,10 @@ public class LatLngCus {
      * Longitude of the location.
      */
     private Double longitude;
+    /**
+     * Longitude of the location.
+     */
+    private String place;
 
     /**
      * Empty constructor for Firebase.
@@ -27,10 +31,24 @@ public class LatLngCus {
      *
      * @param latitude  of the location.
      * @param longitude of the location.
+     * @param place name.
+     */
+    public LatLngCus(Double latitude, Double longitude, String place) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.place = place;
+    }
+
+    /**
+     * Constructor with only coordinates.
+     *
+     * @param latitude  of the location.
+     * @param longitude of the location.
      */
     public LatLngCus(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+        this.place = place;
     }
 
     public Double getLatitude() {
@@ -48,6 +66,15 @@ public class LatLngCus {
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
 
     /**
      * Custom getter to convert it back to the Google Maps LatLng.

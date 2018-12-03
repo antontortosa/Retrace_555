@@ -256,12 +256,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private HashMap<String, Folder> fakeContentCreator() {
         HashMap<String, Folder> folders = new HashMap<String, Folder>();
         // Location corresponds to 1237 Fullerton
-        folders.put("0", new Folder("Home", new LatLngCus(41.925017, -87.659908), new HashMap<String, Task>() {{
+        folders.put("0", new Folder("Home", new LatLngCus(41.925017, -87.659908, "1237 W Fullerton Ave, Chicago, IL 60614"), new HashMap<String, Task>() {{
             put("0", new Task("Clean the house", new GregorianCalendar(2014, Calendar.FEBRUARY, 11).getTime(), null));
             put("1", new Task("Finish the Android Project", new GregorianCalendar(2015, Calendar.MARCH, 16).getTime(), new GregorianCalendar(2018, Calendar.NOVEMBER, 26).getTime()));
         }}));
         // Location corresponds to Wishnick hall.
-        folders.put("1", new Folder("Work", new LatLngCus(41.835118, -87.627608), new HashMap<String, Task>() {{
+        folders.put("1", new Folder("Work", new LatLngCus(41.835118, -87.627608, "Wishnick Hall, IIT"), new HashMap<String, Task>() {{
             put("0", new Task("Meeting with boss", null, null));
             put("1", new Task("Clean table", null, null));
             put("2", new Task("Decide vacations", null, null));
@@ -429,12 +429,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             // Maybe it is an edit
             if (folderId == null) {
                 Log.d("Home", "Adding new folder after + was pressed.");
-                LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0));
+                LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0), getIntent().getStringExtra("Place"));
                 dbManager.writeFolder(folderName, latLngCus);
             } else {
                 // It is an edit!
                 Log.d("Home", "Editing existing folder from EditFolderActivity.");
-                LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0));
+                LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0), getIntent().getStringExtra("Place"));
                 dbManager.editFolder(folderId, folderName, latLngCus);
             }
         }

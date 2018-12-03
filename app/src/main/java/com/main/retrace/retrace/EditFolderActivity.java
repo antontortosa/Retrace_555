@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -81,23 +82,27 @@ public class EditFolderActivity extends AppCompatActivity {
         if (folderName != null) {
             editTextFolderName.setText(folderName, TextView.BufferType.EDITABLE);
             folderId = intent.getStringExtra("FolderId");
-            location = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0));
-            addLocation.setText(location.getLatitude() + "," + location.getLongitude());
+            location = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0), getIntent().getStringExtra("Place"));
+            addLocation.setText(location.getPlace());
 
         }
     }
 
     public void saveFolder(View view) {
         if (location == null) {
-            location = new LatLngCus(41.83367895, -87.62833922405937);
+            Toast.makeText(this, R.string.folder_location_error, Toast.LENGTH_LONG).show();
+            //location = new LatLngCus(41.83367895, -87.62833922405937);
+        }else{
+            //Save folder and go back
+            Intent i = new Intent(EditFolderActivity.this, Home.class);
+            i.putExtra("FolderName", editTextFolderName.getText().toString());
+            i.putExtra("FolderId", folderId);
+            i.putExtra("Lat", location.getLatitude());
+            i.putExtra("Long", location.getLongitude());
+            i.putExtra("Place", location.getPlace());
+            startActivity(i);
         }
-        //Save folder and go back
-        Intent i = new Intent(EditFolderActivity.this, Home.class);
-        i.putExtra("FolderName", editTextFolderName.getText().toString());
-        i.putExtra("FolderId", folderId);
-        i.putExtra("Lat", location.getLatitude());
-        i.putExtra("Long", location.getLongitude());
-        startActivity(i);
+
 
         // TODO: finish activity to remove of it from the stack?
     }
@@ -114,8 +119,8 @@ public class EditFolderActivity extends AppCompatActivity {
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
-                location = new LatLngCus(place.getLatLng().latitude, place.getLatLng().longitude);
-                addLocation.setText(location.getLatitude() + "," + location.getLongitude());
+                location = new LatLngCus(place.getLatLng().latitude, place.getLatLng().longitude, place.getName().toString());
+                addLocation.setText(place.getName());
             }
         }
     }

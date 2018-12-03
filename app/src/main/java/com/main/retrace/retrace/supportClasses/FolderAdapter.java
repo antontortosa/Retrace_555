@@ -78,6 +78,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
 
         // - replace the contents of the view with that element
         holder.mTextViewTitle.setText(folder.getTitle());
+        holder.mTextPlace.setText(folder.getLocation().getPlace());
         // Same for tasks.
 
         holder.buttonViewOption.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +105,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
                                 intent.putExtra("FolderName", folder.getTitle());
                                 intent.putExtra("Lat", folder.getLocation().getLatitude());
                                 intent.putExtra("Long", folder.getLocation().getLongitude());
+                                intent.putExtra("Place", folder.getLocation().getPlace());
                                 context.startActivity(intent);
                                 break;
                             case R.id.folder_menu_delete:
@@ -180,6 +182,10 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
          */
         private TextView mTextViewTitle;
         /**
+         * Descrption of the place
+         */
+        private TextView mTextPlace;
+        /**
          * RecyclerView with the tasks.
          */
         private ListView tasks;
@@ -206,6 +212,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
             super(itemView);
 
             this.mTextViewTitle = itemView.findViewById(R.id.folder_item_title);
+            this.mTextPlace = itemView.findViewById(R.id.placeDescription);
             this.tasks = itemView.findViewById(R.id.folder_item_tasks);
             this.buttonViewOption = itemView.findViewById(R.id.folder_item_menu);
             this.newTaskTextEdit = itemView.findViewById(R.id.folder_item_textinputlayout_edittext);
