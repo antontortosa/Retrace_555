@@ -1,5 +1,6 @@
 package com.main.retrace.retrace;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
@@ -49,6 +50,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -133,8 +135,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         // + (plus) button setup
         FloatingActionButton fab = findViewById(R.id.add_folder);
         mFusedLocationClient = getFusedLocationProviderClient(this);
+        getLastLocation();
         //FIX POSITION FOR TESTING
-        LKL = new LatLngCus(41.83508485, -87.62759632174277);
+        //LKL = new LatLngCus(41.83508485, -87.62759632174277);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -378,8 +381,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return user;
     }
 
-    private void populateNavView() {
-        LinkedHashMap<String, Folder> folders_linked = new LinkedHashMap<String, Folder>(dbManager.getFolders());
+    private void populateNavView(LinkedHashMap<String, Folder> auxfolders) {
+
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
         MenuItem aux_menu;
@@ -423,6 +426,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         double distance;
         if (location != null && LKL != null) {
             distance = SphericalUtil.computeDistanceBetween(location.getLatLng(), LKL.getLatLng());
+            Log.d("XZY--Populate NavView", "Last Known Location is: " + LKL.getLatLng().latitude+","+LKL.getLatLng().longitude);
+            Log.d("XZY--Populate NavView", "Distance from " + location.getPlace() + " is " + distance);
         } else {
             distance = 2147483644;
         }
@@ -441,8 +446,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     public void getLastLocation() {
         // Get last known recent location using new Google Play Services SDK (v11+)
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
