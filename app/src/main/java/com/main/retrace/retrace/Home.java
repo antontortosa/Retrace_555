@@ -1,5 +1,6 @@
 package com.main.retrace.retrace;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
@@ -49,6 +50,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -122,8 +124,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         FloatingActionButton fab = findViewById(R.id.add_folder);
         mFusedLocationClient = getFusedLocationProviderClient(this);
+        getLastLocation();
         //FIX POSITION FOR TESTING
-        LKL = new LatLngCus(41.83508485, -87.62759632174277);
+        //LKL = new LatLngCus(41.83508485, -87.62759632174277);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,7 +195,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         super.onResume();
 
         checkIntent();
-        populateNavView();
+        showProgress(false);
     }
 
     @Override
@@ -332,7 +335,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             mFolderAdapter.setmFolderData(auxfolders);
             mFoldersRecyclerView.setAdapter(mFolderAdapter);
 
-            populateNavView();
+            populateNavView(auxfolders);
         }
     }
 
@@ -340,9 +343,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return user;
     }
 
-    private void populateNavView() {
+    private void populateNavView(LinkedHashMap<String, Folder> auxfolders) {
 
-        LinkedHashMap<String, Folder> folders_linked = new LinkedHashMap<String, Folder>(dbManager.getFolders());
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
         MenuItem aux_menu;
@@ -355,21 +357,25 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
 
         int i = 0;
-        for (Map.Entry<String, Folder> entry : folders_linked.entrySet()) {
+        //auxfolders.forEach((folderId,folder)->{ });
+        for (Map.Entry<String, Folder> entry : auxfolders.entrySet()) {
             String folderId = entry.getKey();
             Folder folder = entry.getValue();
 
             getLastLocation();
-
-            aux_menu = menu.add(R.id.lazy_group, i, calculateOrder(folder.getLocation()), folder.getTitle());
-            aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    //TODO: Intent to folder view
-                    return true;
-                }
-            });
-
+            try{
+                Log.d("XZY--Populate NavView", "Adding "+folder.getTitle());
+                aux_menu = menu.add(R.id.lazy_group, i, i, folder.getTitle());
+                aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        //TODO: Intent to folder view
+                        return true;
+                    }
+                });
+            }catch(IllegalArgumentException e){
+                Log.d("XZY--Populate NavView", "Order exception has jumped");
+            }
             // We need to keep track of what is inside so:
             menuItems.add(i);
             i++;
@@ -380,6 +386,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         double distance;
         if (location != null && LKL != null) {
             distance = SphericalUtil.computeDistanceBetween(location.getLatLng(), LKL.getLatLng());
+            Log.d("XZY--Populate NavView", "Last Known Location is: " + LKL.getLatLng().latitude+","+LKL.getLatLng().longitude);
+            Log.d("XZY--Populate NavView", "Distance from " + location.getPlace() + " is " + distance);
         } else {
             distance = 2147483644;
         }
@@ -398,15 +406,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     public void getLastLocation() {
         // Get last known recent location using new Google Play Services SDK (v11+)
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // GPS location can be null if GPS is switched off
-                        Log.d("MapDemoActivity", "Sucess trying to get last GPS location");
+                        Log.d("MapDemoActivity1", "Sucess trying to get last GPS location");
                         if (location != null) {
                             onLocationChanged(location);
                         }
