@@ -50,7 +50,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -64,6 +63,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      * Adapter for the RecyclerView.
      */
     private FolderAdapter mFolderAdapter;
+
+    /**
+     * Copy of the folders but ordered.
+     */
+    private LinkedHashMap<String, Folder> mOrderedFolders;
 
     /**
      * LinearLayoutManager for the RecyclerView.
@@ -128,6 +132,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
 
         dbManager = new DatabaseManager(this);
+        mOrderedFolders = new LinkedHashMap<String, Folder>();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -323,12 +328,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             setFoldersInOrder();
         }
 
-        mNoFoldersMessage.setVisibility(dbManager.getFolders().isEmpty() ? View.VISIBLE : View.INVISIBLE);
+        mNoFoldersMessage.setVisibility((dbManager.getFolders().isEmpty() && databaseReady) ? View.VISIBLE : View.INVISIBLE);
         populateNavView();
     }
 
     private void setFoldersInOrder() {
-        LinkedHashMap<String, Folder> auxfolders = new LinkedHashMap<String, Folder>();
+        mOrderedFolders = new LinkedHashMap<String, Folder>();
         // If it is not empty if will calculate the order and change it.
         if (!dbManager.getFolders().isEmpty()) {
             LinkedHashMap<String, Integer> fdistances = new LinkedHashMap<String, Integer>();
@@ -345,10 +350,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                     .forEachOrdered(x -> ordered.put(x.getKey(), x.getValue()));
             //store them ordered
             for (String x : ordered.keySet()) {
-                auxfolders.put(x, dbManager.getFolders().get(x));
+                mOrderedFolders.put(x, dbManager.getFolders().get(x));
             }
         }
-        mFolderAdapter.setMFolderData(auxfolders);
+        mFolderAdapter.setMFolderData(mOrderedFolders);
     }
 
     /**
@@ -381,8 +386,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return user;
     }
 
-    private void populateNavView(LinkedHashMap<String, Folder> auxfolders) {
-
+    private void populateNavView() {
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
         MenuItem aux_menu;
@@ -396,7 +400,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         menuItems.clear();
 
         int i = 0;
-        for (Map.Entry<String, Folder> entry : folders_linked.entrySet()) {
+        for (Map.Entry<String, Folder> entry : mOrderedFolders.entrySet()) {
             String folderId = entry.getKey();
             Folder folder = entry.getValue();
 
@@ -404,7 +408,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
             try {
                 Log.d("Home | Populate NavView", "Adding " + folder.getTitle());
-                aux_menu = menu.add(R.id.lazy_group, i, calculateOrder(folder.getLocation()), folder.getTitle());
+                aux_menu = menu.add(R.id.lazy_group, i, i, folder.getTitle());
                 aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -412,8 +416,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                         return true;
                     }
                 });
-            } catch (IllegalArgumentException e) {
-                Log.d("Home | Populate NavView", "Order exception has jumped");
+            }catch(IllegalArgumentException e){
+                Log.d("XZY--Populate NavView", "Order exception has jumped");
             }
 
             // We need to keep track of what is inside so:
@@ -426,8 +430,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         double distance;
         if (location != null && LKL != null) {
             distance = SphericalUtil.computeDistanceBetween(location.getLatLng(), LKL.getLatLng());
-            Log.d("XZY--Populate NavView", "Last Known Location is: " + LKL.getLatLng().latitude+","+LKL.getLatLng().longitude);
-            Log.d("XZY--Populate NavView", "Distance from " + location.getPlace() + " is " + distance);
+            Log.d("Home | Populate NavView", "Last Known Location is: " + LKL.getLatLng().latitude + "," + LKL.getLatLng().longitude);
+            Log.d("Home | Populate NavView", "Distance from " + location.getPlace() + " is " + distance);
         } else {
             distance = 2147483644;
         }
