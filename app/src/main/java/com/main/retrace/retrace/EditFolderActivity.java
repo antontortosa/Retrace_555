@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -90,21 +89,20 @@ public class EditFolderActivity extends AppCompatActivity {
 
     public void saveFolder(View view) {
         if (location == null) {
-            Toast.makeText(this, R.string.folder_location_error, Toast.LENGTH_LONG).show();
-            //location = new LatLngCus(41.83367895, -87.62833922405937);
-        }else{
-            //Save folder and go back
-            Intent i = new Intent(EditFolderActivity.this, Home.class);
-            i.putExtra("FolderName", editTextFolderName.getText().toString());
-            i.putExtra("FolderId", folderId);
-            i.putExtra("Lat", location.getLatitude());
-            i.putExtra("Long", location.getLongitude());
-            i.putExtra("Place", location.getPlace());
-            startActivity(i);
+            // No locatio, so saving nulls.
+            location = new LatLngCus(null, null, "No Place");
         }
 
+        //Save folder and go back
+        Intent i = new Intent(EditFolderActivity.this, Home.class);
+        i.putExtra("FolderName", editTextFolderName.getText().toString());
+        i.putExtra("FolderId", folderId);
+        i.putExtra("Lat", location.getLatitude());
+        i.putExtra("Long", location.getLongitude());
+        i.putExtra("Place", location.getPlace());
+        startActivity(i);
+        finish();
 
-        // TODO: finish activity to remove of it from the stack?
     }
 
     public void setLocation(View view) throws GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {

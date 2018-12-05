@@ -18,6 +18,7 @@
     <string name="folder_menu_delete">Delete Place</string>
     <string name="folder_item_newtask"> + New Task</string>
     <string name="three_menu_dots">&#8942;</string>
+    <string name="no_folders_message">There are no folders.\nCreate a new one using the + button.</string>
 
     <!-- Strings related to login -->
     <string name="title_activity_login">Login</string>

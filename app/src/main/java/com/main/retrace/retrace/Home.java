@@ -74,6 +74,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private View mProgressView;
 
     /**
+     * Reference to the TextView with the no folders message.
+     */
+    private TextView mNoFoldersMessage;
+
+    /**
      * Reference to the database manager.
      */
     private DatabaseManager dbManager;
@@ -98,6 +103,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      */
     private ArrayList<Integer> menuItems;
 
+    /**
+     * Flag to know if the Database was loaded.
+     */
+    private boolean databaseReady;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +130,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // + (plus) button setup
         FloatingActionButton fab = findViewById(R.id.add_folder);
         mFusedLocationClient = getFusedLocationProviderClient(this);
         //FIX POSITION FOR TESTING
@@ -170,8 +181,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         mLayoutManager = new LinearLayoutManager(this);
         mFoldersRecyclerView.setLayoutManager(mLayoutManager);
 
-        // Show the progress since we are loading the data from the Database.
-        showProgress(true);
+        // Show the progress spinner since we are loading the data from the Database.
+        setProgressVisibility(true);
+
+        mNoFoldersMessage = findViewById(R.id.no_folders_message);
 
         // Depending if the Database a different thing is executed.
         final boolean databaseEmpty = false;
@@ -192,6 +205,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         super.onResume();
 
         checkIntent();
+        updateUI(false);
         populateNavView();
     }
 
@@ -286,29 +300,34 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     /**
      * Shows the progress UI and hides the login form. It only shows the progress spinner if the api running on the phone supports it.
      */
-    public void showProgress(final boolean show) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+    public void updateUI(boolean dbReady) {
+        // Check if this is the first call. Only executed if the database was not ready and it is now.
+        if (!databaseReady && dbReady) {
+            // It is ready so change the flag.
+            databaseReady = true;
 
-            mFoldersRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+            // Only is executed once. Create folder adapter and set it..
+            // specify an adapter (see also next example), we couldn't do this because the data wasn't loaded.
+            mFolderAdapter = new FolderAdapter(dbManager, new LinkedHashMap<String, Folder>(dbManager.getFolders()), getApplicationContext());
+            mFoldersRecyclerView.setAdapter(mFolderAdapter);
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mFoldersRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+            // Hide the progress bar.
+            setProgressVisibility(false);
         }
 
-        if (!show) {
-            LinkedHashMap<String, Folder> auxfolders = new LinkedHashMap<String, Folder>();
+        // Order folders. If there are no folders it will make sure there are deleted.
+        if (databaseReady) {
+            setFoldersInOrder();
+        }
+
+        mNoFoldersMessage.setVisibility(dbManager.getFolders().isEmpty() ? View.VISIBLE : View.INVISIBLE);
+        populateNavView();
+    }
+
+    private void setFoldersInOrder() {
+        LinkedHashMap<String, Folder> auxfolders = new LinkedHashMap<String, Folder>();
+        // If it is not empty if will calculate the order and change it.
+        if (!dbManager.getFolders().isEmpty()) {
             LinkedHashMap<String, Integer> fdistances = new LinkedHashMap<String, Integer>();
             LinkedHashMap<String, Integer> ordered = new LinkedHashMap<String, Integer>();
 
@@ -325,14 +344,33 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             for (String x : ordered.keySet()) {
                 auxfolders.put(x, dbManager.getFolders().get(x));
             }
-            // specify an adapter (see also next example), we couldn't do this because the data wasn't loaded.
-            mFolderAdapter = new FolderAdapter(dbManager, getApplicationContext());
-            // Setting folders ordered.
-            // TODO: only DatabaseManager folders should be changed?
-            mFolderAdapter.setmFolderData(auxfolders);
-            mFoldersRecyclerView.setAdapter(mFolderAdapter);
+        }
+        mFolderAdapter.setMFolderData(auxfolders);
+    }
 
-            populateNavView();
+    /**
+     * Method to show or hide the progress bar, it also shows or hides the folders at the same time.
+     *
+     * @param show true if you want to show it.
+     */
+    private void setProgressVisibility(boolean show) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mFoldersRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mFoldersRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -341,7 +379,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void populateNavView() {
-
         LinkedHashMap<String, Folder> folders_linked = new LinkedHashMap<String, Folder>(dbManager.getFolders());
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
@@ -362,14 +399,19 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
             getLastLocation();
 
-            aux_menu = menu.add(R.id.lazy_group, i, calculateOrder(folder.getLocation()), folder.getTitle());
-            aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    //TODO: Intent to folder view
-                    return true;
-                }
-            });
+            try {
+                Log.d("Home | Populate NavView", "Adding " + folder.getTitle());
+                aux_menu = menu.add(R.id.lazy_group, i, calculateOrder(folder.getLocation()), folder.getTitle());
+                aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        //TODO: Intent to folder view
+                        return true;
+                    }
+                });
+            } catch (IllegalArgumentException e) {
+                Log.d("Home | Populate NavView", "Order exception has jumped");
+            }
 
             // We need to keep track of what is inside so:
             menuItems.add(i);
@@ -384,7 +426,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         } else {
             distance = 2147483644;
         }
-        return (int)distance;
+        return (int) distance;
     }
 
     public void onLocationChanged(Location location) {
@@ -439,5 +481,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 dbManager.editFolder(folderId, folderName, latLngCus);
             }
         }
+    }
+
+    private void setDatabaseReady(boolean databaseReady) {
+        this.databaseReady = databaseReady;
+
     }
 }

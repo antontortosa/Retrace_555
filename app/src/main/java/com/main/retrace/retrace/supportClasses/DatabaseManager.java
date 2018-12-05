@@ -68,10 +68,10 @@ public class DatabaseManager {
                 folders.clear();
 
                 for (DataSnapshot folderSnapshot : dataSnapshot.getChildren()) {
-
                     folders.put(folderSnapshot.getKey(), folderSnapshot.getValue(Folder.class));
                 }
-                home.showProgress(false);
+
+                home.updateUI(true);
             }
 
             @Override
@@ -191,7 +191,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Setter for the folders.
+     * Setter for the folders. Only use to manually override the folders!
      *
      * @param folders the new folders.
      */

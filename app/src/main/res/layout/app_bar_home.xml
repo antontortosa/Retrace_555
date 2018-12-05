@@ -22,14 +22,13 @@
 
     <include layout="@layout/content_home" />
 
-    <!-- TODO: change style of button -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_folder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/colorPrimary"
-        app:srcCompat="@android:drawable/ic_menu_add" />
+        android:src="@drawable/add"
+        app:backgroundTint="@color/colorPrimary" />
 
 </android.support.design.widget.CoordinatorLayout>

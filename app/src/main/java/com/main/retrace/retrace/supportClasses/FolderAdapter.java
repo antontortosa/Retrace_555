@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.icu.util.Calendar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,7 +26,7 @@ import java.util.LinkedHashMap;
 /**
  * Customized Folder Adapter.
  */
-public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHolder> {
+public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
     /**
      * Folder Data.
      */
@@ -44,10 +45,11 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
     /**
      * Constructor for the class.
      *
-     * @param databaseManager reference.
+     * @param databaseManager reference. Only used to remove folders or tasks (inside TaskAdapter), folders of the database are not used.
+     * @param folders
      */
-    public FolderAdapter(DatabaseManager databaseManager, Context context) {
-        this.mFolderData = new LinkedHashMap<String, Folder>(databaseManager.getFolders());
+    public FolderAdapter(DatabaseManager databaseManager, LinkedHashMap<String, Folder> folders, Context context) {
+        this.mFolderData = folders;
         this.context = context;
         this.databaseManager = databaseManager;
     }
@@ -125,7 +127,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
         holder.setFolderId(folderId);
 
         // Before creating the TaskAdapter let's check if there are any tasks.
-        if (databaseManager.getFolders().get(folderId).getTasks() != null) {
+        if (mFolderData.get(folderId).getTasks() != null) {
             TaskAdapter taskAdapter = new TaskAdapter(databaseManager, folderId, context);
 
             holder.tasks.setAdapter(taskAdapter);
@@ -165,8 +167,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
      *
      * @param mFolderData
      */
-    public void setmFolderData(LinkedHashMap<String, Folder> mFolderData) {
+    public void setMFolderData(LinkedHashMap<String, Folder> mFolderData) {
         this.mFolderData = mFolderData;
+        notifyDataSetChanged();
     }
 
     // Provide a reference to the views for each data item
@@ -182,7 +185,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.MyViewHold
          */
         private TextView mTextViewTitle;
         /**
-         * Descrption of the place
+         * Description of the place
          */
         private TextView mTextPlace;
         /**
