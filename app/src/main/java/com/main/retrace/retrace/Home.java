@@ -281,24 +281,26 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         folders.put("0", new Folder("Home", new LatLngCus(41.925017, -87.659908, "1237 W Fullerton Ave, Chicago, IL 60614"), new HashMap<String, Task>() {{
             put("0", new Task("Clean the house", new GregorianCalendar(2014, Calendar.FEBRUARY, 11).getTime(), null));
             put("1", new Task("Finish the Android Project", new GregorianCalendar(2015, Calendar.MARCH, 16).getTime(), new GregorianCalendar(2018, Calendar.NOVEMBER, 26).getTime()));
-        }}));
+        }}, "000000"));
         // Location corresponds to Wishnick hall.
         folders.put("1", new Folder("Work", new LatLngCus(41.835118, -87.627608, "Wishnick Hall, IIT"), new HashMap<String, Task>() {{
             put("0", new Task("Meeting with boss", null, null));
             put("1", new Task("Clean table", null, null));
             put("2", new Task("Decide vacations", null, null));
-        }}));
+        }}, "000000"));
 
         return folders;
     }
 
     /**
      * Triggers the update of the database so it is updated with the value of the folders attribute.
+     *
+     * @param userId of the user where the folders have to be created.
      */
     private void populateDatabase(String userId) {
         for (String s : dbManager.getFolders().keySet()) {
             Folder folder = dbManager.getFolders().get(s);
-            String folderId = dbManager.writeFolder(userId, folder.getTitle(), folder.getLocation());
+            String folderId = dbManager.writeFolder(userId, folder.getTitle(), folder.getLocation(), folder.getFolderColor());
             for (String s1 : folder.getTasks().keySet()) {
                 dbManager.writeTask(userId, folderId, folder.getTasks().get(s1));
             }
@@ -307,6 +309,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     /**
      * Shows the progress UI and hides the login form. It only shows the progress spinner if the api running on the phone supports it.
+     *
+     * @param dbReady should only be used by the DatabaseManager to tell the UI that the data is ready.
      */
     public void updateUI(boolean dbReady) {
         // Check if this is the first call. Only executed if the database was not ready and it is now.
@@ -332,6 +336,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         populateNavView();
     }
 
+    /**
+     * Orders the folders of {@link Home#mOrderedFolders} based on proximity to the user's location..
+     */
     private void setFoldersInOrder() {
         mOrderedFolders = new LinkedHashMap<String, Folder>();
         // If it is not empty if will calculate the order and change it.
@@ -386,6 +393,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         return user;
     }
 
+    /**
+     * Populates the lateral nav view.
+     */
     private void populateNavView() {
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
@@ -416,7 +426,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                         return true;
                     }
                 });
-            }catch(IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 Log.d("XZY--Populate NavView", "Order exception has jumped");
             }
 
@@ -426,6 +436,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
     }
 
+    /**
+     * Calculates the order.
+     *
+     * @param location
+     * @return
+     */
     public int calculateOrder(LatLngCus location) {
         double distance;
         if (location != null && LKL != null) {
@@ -473,6 +489,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 });
     }
 
+    /**
+     * Checks who called tha activity and acts upon it.
+     */
     private void checkIntent() {
         // Checking if this comes from the EditFolder Activity
         String folderName = getIntent().getStringExtra("FolderName");
@@ -482,18 +501,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             if (folderId == null) {
                 Log.d("Home", "Adding new folder after + was pressed.");
                 LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0), getIntent().getStringExtra("Place"));
-                dbManager.writeFolder(folderName, latLngCus);
+                dbManager.writeFolder(folderName, latLngCus, getIntent().getStringExtra("Color"));
             } else {
                 // It is an edit!
                 Log.d("Home", "Editing existing folder from EditFolderActivity.");
                 LatLngCus latLngCus = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0), getIntent().getStringExtra("Place"));
-                dbManager.editFolder(folderId, folderName, latLngCus);
+                dbManager.editFolder(folderId, folderName, latLngCus, getIntent().getStringExtra("Color"));
             }
         }
-    }
-
-    private void setDatabaseReady(boolean databaseReady) {
-        this.databaseReady = databaseReady;
-
     }
 }

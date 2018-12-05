@@ -22,6 +22,7 @@ public class DatabaseManager {
     private final static String TASK_CHILDNAME = "tasks";
     private final static String FOLDER_KEY_TITLE = "title";
     private final static String FOLDER_KEY_LOCATION = "location";
+    private final static String FOLDER_KEY_COLOR = "color";
     /**
      * Reference to the database.
      */
@@ -90,7 +91,7 @@ public class DatabaseManager {
      * @param title  of the folder.
      * @return the folderId.
      */
-    public String writeFolder(String userId, String title, LatLngCus location) {
+    public String writeFolder(String userId, String title, LatLngCus location, String color) {
         String folderId = databaseReference.child(FOLDER_CHILDNAME).child(userId).push().getKey();
         databaseReference.child(FOLDER_CHILDNAME).child(userId).child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
         databaseReference.child(FOLDER_CHILDNAME).child(userId).child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
@@ -100,12 +101,15 @@ public class DatabaseManager {
     /**
      * Creates a new folder into the user that it is currently logged in.
      *
-     * @param title of the folder.
+     * @param title    of the folder.
+     * @param location of the folder.
+     * @param color    of the folder.
      */
-    public void writeFolder(String title, LatLngCus location) {
+    public void writeFolder(String title, LatLngCus location, String color) {
         String folderId = databaseReference.child(FOLDER_CHILDNAME).child(user.getUid()).push().getKey();
         folderReference.child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
         folderReference.child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
+        folderReference.child(folderId).child(FOLDER_KEY_COLOR).setValue(color);
         Log.d("DatabaseManager | Folder", "New folder created: " + title + ", id: " + folderId);
     }
 
@@ -115,10 +119,12 @@ public class DatabaseManager {
      * @param folderId of the existing folder.
      * @param title    the new title.
      * @param location the new location.
+     * @param color    the new color.
      */
-    public void editFolder(String folderId, String title, LatLngCus location) {
+    public void editFolder(String folderId, String title, LatLngCus location, String color) {
         folderReference.child(folderId).child(FOLDER_KEY_TITLE).setValue(title);
         folderReference.child(folderId).child(FOLDER_KEY_LOCATION).setValue(location);
+        folderReference.child(folderId).child(FOLDER_KEY_COLOR).setValue(color);
         Log.d("DatabaseManager | Folder", "Folder edited: " + title + ", id: " + folderId);
     }
 
@@ -128,7 +134,6 @@ public class DatabaseManager {
      * @param folderId of the folder to remove.
      */
     public void removeFolder(String folderId) {
-
         folderReference.child(folderId).removeValue();
         Log.d("DatabaseManager | Folder", "Folder removed, id: " + folderId);
     }

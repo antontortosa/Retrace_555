@@ -22,7 +22,6 @@ public class EditFolderActivity extends AppCompatActivity {
      * Reference to the EditText with the folder name.
      */
     private EditText editTextFolderName;
-
     /**
      * Reference to the TextView with the folder location.
      */
@@ -39,6 +38,10 @@ public class EditFolderActivity extends AppCompatActivity {
      * Reference to the folderId in case it was sent on the intent.
      */
     private String folderId;
+    /**
+     * Reference to the folder color.
+     */
+    private String folderColor;
 
     private int PLACE_PICKER_REQUEST = 1;
     private TextWatcher filterTextWatcher = new TextWatcher() {
@@ -74,6 +77,8 @@ public class EditFolderActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.buttonSave);
         saveButton.setEnabled(false);
         addLocation = findViewById(R.id.addLocation);
+        // By default the color is white.
+        folderColor = "ffffff";
 
         // Let's check if this comes from an already existing folder.
         Intent intent = getIntent();
@@ -100,6 +105,7 @@ public class EditFolderActivity extends AppCompatActivity {
         i.putExtra("Lat", location.getLatitude());
         i.putExtra("Long", location.getLongitude());
         i.putExtra("Place", location.getPlace());
+        i.putExtra("Color", folderColor);
         startActivity(i);
         finish();
 
