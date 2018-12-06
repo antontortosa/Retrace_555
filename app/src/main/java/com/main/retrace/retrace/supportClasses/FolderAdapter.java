@@ -246,6 +246,7 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
                         String text = v.getText().toString();
                         databaseManager.writeTask(folderId, new Task(text, Calendar.getInstance().getTime(), null));
+                        v.setText("");
                         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                         return true;

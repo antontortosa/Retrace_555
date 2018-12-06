@@ -32,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
             // already signed in
             Log.d("Login", "User already signed in, taking to Home. User id: " + auth.getUid());
             startActivity(new Intent(LoginActivity.this, Home.class));
+            finish();
         } else {
             // not signed in
             Log.d("Login", "User not signed in, showing login options.");

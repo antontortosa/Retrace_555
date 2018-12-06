@@ -241,15 +241,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        /*if (id == R.id.nav_unplaced) {
-            // Open unplaced folder
-
-        }*/
-        if (id == R.id.nav_new_item) {
+        if (id == R.id.nav_show_all_folders) {
+            // Show all folders folder
+            mFoldersVisibleIds.clear();
+            updateUI(false);
+        } else if (id == R.id.nav_new_item) {
             // Add new folder
             startActivity(new Intent(Home.this, EditFolderActivity.class));
-        } else if (id == R.id.nav_settings) {
-
         } else if (id == R.id.nav_about) {
             // About us
             startActivity(new Intent(Home.this, AboutActivity.class));
@@ -431,6 +429,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                         mFoldersVisibleIds.clear();
                         mFoldersVisibleIds.add(folderId);
                         updateUI(false);
+
+                        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                        drawer.closeDrawer(GravityCompat.START);
                         return true;
                     }
                 });
