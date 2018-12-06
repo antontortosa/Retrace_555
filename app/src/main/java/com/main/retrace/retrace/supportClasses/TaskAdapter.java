@@ -79,12 +79,11 @@ public class TaskAdapter extends BaseAdapter {
         viewHolder.mCheckBox.setText(task.getName());
 
         viewHolder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                            @Override
-                                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                                databaseManager.removeTask(folderId, taskId);
-                                                            }
-                                                        }
-        );
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                databaseManager.removeTask(folderId, taskId);
+            }
+        });
 
         // Return the completed view to render on screen
         return convertView;

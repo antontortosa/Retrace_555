@@ -82,10 +82,14 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
         String folderId = new ArrayList<String>(mFolderData.keySet()).get(position);
 
         // - replace the contents of the view with that element
-        holder.mLayout.setBackgroundColor(Color.parseColor(folder.getColor()));
-        holder.mTextViewTitle.setText(folder.getTitle());
-        if (folder.getLocation().getPlace() != null) {
-            holder.mTextPlace.setText(folder.getLocation().getPlace());
+        if(folder!=null){
+            if(folder.getColor()!=null){
+                holder.mLayout.setBackgroundColor(Color.parseColor(folder.getColor()));
+            }
+            holder.mTextViewTitle.setText(folder.getTitle());
+            if (folder.getLocation().getPlace() != null) {
+                holder.mTextPlace.setText(folder.getLocation().getPlace());
+            }
         }
         // Same for tasks.
 

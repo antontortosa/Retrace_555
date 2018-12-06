@@ -6,7 +6,7 @@
     <group
         android:id="@+id/menu_top"
         android:checkableBehavior="single"
-        android:orderInCategory="2147483646">
+        android:orderInCategory="0">
         <item
             android:id="@+id/nav_show_all_folders"
             android:icon="@drawable/home"
