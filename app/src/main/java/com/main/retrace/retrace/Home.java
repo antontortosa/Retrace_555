@@ -435,7 +435,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                         updateUI(false);
 
                         menu.getItem(0).setChecked(false);
-                        menu.getItem(item.getItemId()).setChecked(true);
+                        menu.getItem(item.getItemId() + 2).setChecked(true);
 
                         DrawerLayout drawer = findViewById(R.id.drawer_layout);
                         drawer.closeDrawer(GravityCompat.START);
