@@ -169,6 +169,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        // Highlight home.
+        navigationView.getMenu().getItem(0).setChecked(true);
 
         // Set user name & profile picture
         View headerView = navigationView.getHeaderView(0);
@@ -245,6 +247,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             // Show all folders folder
             mFoldersVisibleIds.clear();
             updateUI(false);
+            NavigationView navView = findViewById(R.id.nav_view);
+            item.setChecked(true);
         } else if (id == R.id.nav_new_item) {
             // Add new folder
             startActivity(new Intent(Home.this, EditFolderActivity.class));
@@ -429,6 +433,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                         mFoldersVisibleIds.clear();
                         mFoldersVisibleIds.add(folderId);
                         updateUI(false);
+
+                        menu.getItem(0).setChecked(false);
+                        menu.getItem(item.getItemId()).setChecked(true);
 
                         DrawerLayout drawer = findViewById(R.id.drawer_layout);
                         drawer.closeDrawer(GravityCompat.START);
