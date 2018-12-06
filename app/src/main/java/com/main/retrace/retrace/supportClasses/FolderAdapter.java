@@ -46,7 +46,7 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
      * Constructor for the class.
      *
      * @param databaseManager reference. Only used to remove folders or tasks (inside TaskAdapter), folders of the database are not used.
-     * @param folders
+     * @param folders         reference to the folders that will be displayed.
      */
     public FolderAdapter(DatabaseManager databaseManager, LinkedHashMap<String, Folder> folders, Context context) {
         this.mFolderData = folders;
@@ -165,7 +165,7 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
     /**
      * Setter for the folders.
      *
-     * @param mFolderData
+     * @param mFolderData with the new folders.
      */
     public void setMFolderData(LinkedHashMap<String, Folder> mFolderData) {
         this.mFolderData = mFolderData;
@@ -204,6 +204,10 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
          * Reference to the folderId where the TextEdit is located.
          */
         private String folderId;
+        /**
+         * Color of the folder.
+         */
+        private String folderColor;
 
         /**
          * Constructor.

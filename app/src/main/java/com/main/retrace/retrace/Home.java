@@ -153,13 +153,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         // Set user name & profile picture
@@ -300,7 +300,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private void populateDatabase(String userId) {
         for (String s : dbManager.getFolders().keySet()) {
             Folder folder = dbManager.getFolders().get(s);
-            String folderId = dbManager.writeFolder(userId, folder.getTitle(), folder.getLocation(), folder.getFolderColor());
+            String folderId = dbManager.writeFolder(userId, folder.getTitle(), folder.getLocation(), folder.getColor());
             for (String s1 : folder.getTasks().keySet()) {
                 dbManager.writeTask(userId, folderId, folder.getTasks().get(s1));
             }
@@ -397,7 +397,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      * Populates the lateral nav view.
      */
     private void populateNavView() {
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navView = findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
         MenuItem aux_menu;
 
@@ -439,8 +439,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     /**
      * Calculates the order.
      *
-     * @param location
-     * @return
+     * @param location actual.
+     * @return the position.
      */
     public int calculateOrder(LatLngCus location) {
         double distance;

@@ -24,7 +24,7 @@ public class Folder {
     /**
      * Color of the folder.
      */
-    private String folderColor;
+    private String color;
 
     /**
      * Empty constructor for FireBase compatibility.
@@ -35,23 +35,24 @@ public class Folder {
     /**
      * Constructor for the class.
      *
-     * @param title    of the folder.
-     * @param location of the folder.
-     * @param tasks    HashMap with all the tasks.
+     * @param title       of the folder.
+     * @param location    of the folder.
+     * @param tasks       HashMap with all the tasks.
+     * @param color color of the folder.
      */
-    public Folder(String title, LatLngCus location, HashMap<String, Task> tasks, String folderColor) {
+    public Folder(String title, LatLngCus location, HashMap<String, Task> tasks, String color) {
         this.title = title;
         this.tasks = tasks;
         this.location = location;
-        this.folderColor = folderColor;
+        this.color = color;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getFolderColor() {
-        return folderColor;
+    public String getColor() {
+        return color;
     }
 
     public LatLngCus getLocation() {
