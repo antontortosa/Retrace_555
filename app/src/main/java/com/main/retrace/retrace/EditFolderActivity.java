@@ -17,7 +17,6 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.main.retrace.retrace.supportClasses.LatLngCus;
-
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
@@ -62,7 +61,7 @@ public class EditFolderActivity extends AppCompatActivity {
             if (!s.toString().equals("")) {
                 //TODO: Check if the folder name is already in use
                 saveButton.setEnabled(true);
-                saveButton.setTextColor(getResources().getColor(R.color.colorPrimary,null));
+                saveButton.setTextColor(getResources().getColor(R.color.colorPrimary, null));
             }
         }
 
@@ -88,11 +87,11 @@ public class EditFolderActivity extends AppCompatActivity {
         editTextFolderName.addTextChangedListener(filterTextWatcher);
         saveButton = findViewById(R.id.buttonSave);
         saveButton.setEnabled(false);
-        saveButton.setTextColor(getResources().getColor(R.color.grey,null));
+        saveButton.setTextColor(getResources().getColor(R.color.grey, null));
         colorButton = findViewById(R.id.buttonColor);
         addLocation = findViewById(R.id.addLocation);
         // By default the color is white.
-        folderColor = getResources().getString(0+R.color.folderDefault);
+        folderColor = getResources().getString(0 + R.color.folderDefault);
         colorButton.setBackgroundColor(Color.parseColor(folderColor));
 
         // Let's check if this comes from an already existing folder.

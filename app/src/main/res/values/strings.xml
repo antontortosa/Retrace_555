@@ -8,6 +8,7 @@
     <string name="nav_header_title">USER_NAME</string>
     <string name="nav_header_subtitle">VALUABLE INFORMATION??</string>
     <string name="nav_header_desc">Navigation header</string>
+    <string name="nav_drawer_show_all_folders"> Show All Folders</string>
     <string name="nav_drawer_unplaced"> Unplaced</string>
     <string name="nav_drawer_nwfolder"> New Place</string>
     <string name="nav_drawer_settings"> Settings</string>
@@ -51,8 +52,6 @@
     <string name="folder_save_button">Save</string>
     <string name="folder_location_error">Location error, please try again.</string>
     <string name="title_activity_settings">Settings</string>
-
-
 
     <!-- About -->
     <string name="about_description">Your favorite app to remember all the things you need to do with the help of the location.</string>

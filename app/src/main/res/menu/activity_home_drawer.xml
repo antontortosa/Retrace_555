@@ -18,9 +18,9 @@
             android:icon="@drawable/add"
             android:title="@string/nav_drawer_nwfolder" />
         <item
-            android:id="@+id/nav_show_home"
+            android:id="@+id/nav_show_all_folders"
             android:icon="@drawable/add"
-            android:title="@string/nav_drawer_nwfolder" />
+            android:title="@string/nav_drawer_show_all_folders" />
     </group>
 
     <group

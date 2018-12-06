@@ -7,18 +7,20 @@
     android:orientation="vertical"
     tools:context=".EditFolderActivity"
     tools:layout_editor_absoluteY="81dp">
+
     <TextView
         android:id="@+id/add_folderTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/folder_viewtitle"/>
+        android:text="@string/folder_viewtitle"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
     <TextView
         android:id="@+id/folderNameView"
         android:layout_width="wrap_content"
@@ -28,6 +30,7 @@
         android:text="@string/folder_new_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/folderNameEdit"
         android:layout_width="wrap_content"
@@ -35,66 +38,72 @@
         android:layout_marginStart="10dp"
         android:ems="10"
         android:hint="@string/folder_new_name_hint"
-        android:inputType="textPersonName"/>
+        android:inputType="textPersonName" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
     <TextView
         android:id="@+id/folderNameView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:text="@string/folder_location"/>
+        android:text="@string/folder_location" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <TextView
             android:id="@+id/addLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:hint="@string/folder_add_location"
             android:layout_weight="1"
+            android:hint="@string/folder_add_location"
             android:onClick="setLocation" />
 
     </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
+
     <TextView
         android:id="@+id/choseColorView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
-        android:text="@string/folder_choose_color"/>
+        android:text="@string/folder_choose_color" />
+
     <Button
         android:id="@+id/buttonColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="setColor"/>
+        android:onClick="setColor" />
+
     <Button
         android:id="@+id/buttonColorChange"
         style="@style/AppTheme.SaveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|center"
-        android:textSize="12dp"
+        android:onClick="setColor"
         android:text="@string/folder_choose_color_btn"
-        android:onClick="setColor"/>
+        android:textSize="12dp" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -111,9 +120,9 @@
             android:layout_gravity="center_horizontal|center"
             android:layout_marginBottom="6dp"
             android:onClick="saveFolder"
-            android:textStyle="bold"
+            android:text="@string/folder_save_button"
             android:textSize="18dp"
-            android:text="@string/folder_save_button" />
+            android:textStyle="bold" />
 
     </LinearLayout>
 

@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -85,7 +84,7 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
         // - replace the contents of the view with that element
         holder.mLayout.setBackgroundColor(Color.parseColor(folder.getColor()));
         holder.mTextViewTitle.setText(folder.getTitle());
-        if(folder.getLocation().getPlace()!=null){
+        if (folder.getLocation().getPlace() != null) {
             holder.mTextPlace.setText(folder.getLocation().getPlace());
         }
         // Same for tasks.
