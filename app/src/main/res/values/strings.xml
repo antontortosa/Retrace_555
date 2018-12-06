@@ -38,9 +38,16 @@
     <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
 
     <!-- Strings related to Edit/Create Folder -->
+    <string name="folder_viewtitle">Add a new folder</string>
     <string name="folder_new_name">Folder Name</string>
+    <string name="folder_new_name_hint">New name</string>
     <string name="folder_location">Location</string>
     <string name="folder_add_location">Add Location</string>
+    <string name="folder_choose_color">Color</string>
+    <string name="folder_choose_color_btn">Choose Folder Color</string>
     <string name="folder_save_button">Save</string>
     <string name="folder_location_error">Location error, please try again.</string>
+    <string name="title_activity_settings">Settings</string>
+
+
 </resources>

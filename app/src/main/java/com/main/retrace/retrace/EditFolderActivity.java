@@ -1,7 +1,9 @@
 package com.main.retrace.retrace;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,6 +17,9 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.main.retrace.retrace.supportClasses.LatLngCus;
+
+import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
+import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 public class EditFolderActivity extends AppCompatActivity {
 
@@ -31,6 +36,10 @@ public class EditFolderActivity extends AppCompatActivity {
      */
     private LatLngCus location;
     /**
+     * Reference to the color button.
+     */
+    private Button colorButton;
+    /**
      * Reference to the save button.
      */
     private Button saveButton;
@@ -43,6 +52,7 @@ public class EditFolderActivity extends AppCompatActivity {
      */
     private String folderColor;
 
+
     private int PLACE_PICKER_REQUEST = 1;
     private TextWatcher filterTextWatcher = new TextWatcher() {
 
@@ -52,6 +62,7 @@ public class EditFolderActivity extends AppCompatActivity {
             if (!s.toString().equals("")) {
                 //TODO: Check if the folder name is already in use
                 saveButton.setEnabled(true);
+                saveButton.setTextColor(getResources().getColor(R.color.colorPrimary,null));
             }
         }
 
@@ -72,13 +83,17 @@ public class EditFolderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_folder);
+
         this.editTextFolderName = findViewById(R.id.folderNameEdit);
         editTextFolderName.addTextChangedListener(filterTextWatcher);
         saveButton = findViewById(R.id.buttonSave);
         saveButton.setEnabled(false);
+        saveButton.setTextColor(getResources().getColor(R.color.grey,null));
+        colorButton = findViewById(R.id.buttonColor);
         addLocation = findViewById(R.id.addLocation);
         // By default the color is white.
-        folderColor = "ffffff";
+        folderColor = getResources().getString(0+R.color.folderDefault);
+        colorButton.setBackgroundColor(Color.parseColor(folderColor));
 
         // Let's check if this comes from an already existing folder.
         Intent intent = getIntent();
@@ -88,7 +103,8 @@ public class EditFolderActivity extends AppCompatActivity {
             folderId = intent.getStringExtra("FolderId");
             location = new LatLngCus(getIntent().getDoubleExtra("Lat", 0), getIntent().getDoubleExtra("Long", 0), getIntent().getStringExtra("Place"));
             addLocation.setText(location.getPlace());
-
+            folderColor = intent.getStringExtra("Color");
+            colorButton.setBackgroundColor(Color.parseColor(folderColor));
         }
     }
 
@@ -127,5 +143,25 @@ public class EditFolderActivity extends AppCompatActivity {
                 addLocation.setText(place.getName());
             }
         }
+    }
+
+    public void setColor(View view) {
+        int cl = Color.parseColor(folderColor);
+        final ColorPicker cp = new ColorPicker(EditFolderActivity.this, Color.red(cl), Color.green(cl), Color.blue(cl));
+        cp.show();
+
+        cp.enableAutoClose(); // Enable auto-dismiss for the dialog
+
+        /* Set a new Listener called when user click "select" */
+        cp.setCallback(new ColorPickerCallback() {
+            @Override
+            public void onColorChosen(@ColorInt int color) {
+
+                folderColor = String.format("#%06X", (0xFFFFFF & color));
+                colorButton.setBackgroundColor(Color.parseColor(folderColor));
+                // If the auto-dismiss option is not enable (disabled as default) you have to manually dimiss the dialog
+                //cp.dismiss();
+            }
+        });
     }
 }

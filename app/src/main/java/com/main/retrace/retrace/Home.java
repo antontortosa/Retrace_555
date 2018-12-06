@@ -247,7 +247,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             // Add new folder
 
         } else if (id == R.id.nav_settings) {
-            //  Open settings
 
         } else if (id == R.id.nav_about) {
             // About us
