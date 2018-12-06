@@ -54,6 +54,9 @@ dependencies {
 
     // Profile Picture
     implementation 'com.squareup.picasso:picasso:2.5.2'
+
+    //color picker
+    implementation 'com.pes.materialcolorpicker:library:1.2.4'
 }
 
 // Firebase

@@ -1,79 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".EditFolderActivity"
     tools:layout_editor_absoluteY="81dp">
-
+    <TextView
+        android:id="@+id/add_folderTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/folder_viewtitle"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/darker_gray"/>
     <TextView
         android:id="@+id/folderNameView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="17dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
         android:text="@string/folder_new_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/folderNameView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="@string/folder_location"
-        app:layout_constraintBottom_toTopOf="@+id/addLocation"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <EditText
         android:id="@+id/folderNameEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="37dp"
-        android:layout_marginBottom="27dp"
+        android:layout_marginStart="10dp"
         android:ems="10"
-        android:hint="New Name"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/addLocation"
-        app:layout_constraintStart_toStartOf="@+id/folderNameView"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:hint="@string/folder_new_name_hint"
+        android:inputType="textPersonName"/>
 
-    <Button
-        android:id="@+id/buttonSave"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/darker_gray"/>
+    <TextView
+        android:id="@+id/folderNameView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:onClick="saveFolder"
-        android:text="@string/folder_save_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addLocation" />
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/folder_location"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/addLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:hint="@string/folder_add_location"
+            android:layout_weight="1"
+            android:onClick="setLocation" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/darker_gray"/>
     <TextView
-        android:id="@+id/addLocation"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="313dp"
-        android:hint="@string/folder_add_location"
-        android:onClick="setLocation"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSave"
-        app:layout_constraintEnd_toStartOf="@+id/add_location_btn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/folderNameEdit" />
+        android:id="@+id/choseColorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/folder_choose_color"/>
+    <Button
+        android:id="@+id/buttonColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="setColor"/>
+    <Button
+        android:id="@+id/buttonColorChange"
+        style="@style/AppTheme.SaveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center"
+        android:textSize="12dp"
+        android:text="@string/folder_choose_color_btn"
+        android:onClick="setColor"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/darker_gray"/>
 
-    <ImageView
-        android:id="@+id/add_location_btn"
-        android:layout_width="44dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="45dp"
-        android:onClick="setLocation"
-        app:layout_constraintRight_toRightOf="@+id/addLocation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addLocation"
-        app:layout_constraintTop_toTopOf="@+id/addLocation"
-        app:srcCompat="@drawable/next" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:gravity="center|bottom"
+        android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+        <Button
+            android:id="@+id/buttonSave"
+            style="@style/AppTheme.SaveButton"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center"
+            android:layout_marginBottom="6dp"
+            android:onClick="saveFolder"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:text="@string/folder_save_button" />
+
+    </LinearLayout>
+
+</LinearLayout>

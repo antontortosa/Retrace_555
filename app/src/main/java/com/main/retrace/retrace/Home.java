@@ -249,7 +249,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             // Add new folder
             startActivity(new Intent(Home.this, EditFolderActivity.class));
         } else if (id == R.id.nav_settings) {
-            //  Open settings
 
         } else if (id == R.id.nav_about) {
             // About us

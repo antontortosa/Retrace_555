@@ -2,6 +2,7 @@ package com.main.retrace.retrace.supportClasses;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +15,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.main.retrace.retrace.EditFolderActivity;
@@ -80,8 +83,11 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
         String folderId = new ArrayList<String>(mFolderData.keySet()).get(position);
 
         // - replace the contents of the view with that element
+        holder.mLayout.setBackgroundColor(Color.parseColor(folder.getColor()));
         holder.mTextViewTitle.setText(folder.getTitle());
-        holder.mTextPlace.setText(folder.getLocation().getPlace());
+        if(folder.getLocation().getPlace()!=null){
+            holder.mTextPlace.setText(folder.getLocation().getPlace());
+        }
         // Same for tasks.
 
         holder.buttonViewOption.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +118,7 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
                                 intent.putExtra("Lat", folder.getLocation().getLatitude());
                                 intent.putExtra("Long", folder.getLocation().getLongitude());
                                 intent.putExtra("Place", folder.getLocation().getPlace());
+                                intent.putExtra("Color", folder.getColor());
                                 context.startActivity(intent);
                                 break;
                             case R.id.folder_menu_delete:
@@ -185,6 +192,10 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
      */
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         /**
+         * whole view
+         */
+        private RelativeLayout mLayout;
+        /**
          * Title of the folder
          */
         private TextView mTextViewTitle;
@@ -222,6 +233,7 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
         private MyViewHolder(final DatabaseManager databaseManager, View itemView) {
             super(itemView);
 
+            this.mLayout = itemView.findViewById(R.id.folder_item);
             this.mTextViewTitle = itemView.findViewById(R.id.folder_item_title);
             this.mTextPlace = itemView.findViewById(R.id.placeDescription);
             this.tasks = itemView.findViewById(R.id.folder_item_tasks);
