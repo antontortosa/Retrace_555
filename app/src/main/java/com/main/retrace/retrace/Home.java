@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -65,9 +66,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private FolderAdapter mFolderAdapter;
 
     /**
+     * List of the keys of the visible folders, use to filter out.
+     */
+    private HashSet<String> mFoldersVisibleIds;
+
+    /**
      * Copy of the folders but ordered.
      */
-    private LinkedHashMap<String, Folder> mOrderedFolders;
+    private LinkedHashMap<String, Folder> mAllOrderedFolders;
 
     /**
      * LinearLayoutManager for the RecyclerView.
@@ -114,6 +120,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
      */
     private boolean databaseReady;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +139,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
 
         dbManager = new DatabaseManager(this);
-        mOrderedFolders = new LinkedHashMap<String, Folder>();
+        mAllOrderedFolders = new LinkedHashMap<String, Folder>();
+        mFoldersVisibleIds = new HashSet<String>();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -227,31 +235,25 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.search_menu, menu);
-        return true;
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_unplaced) {
+        /*if (id == R.id.nav_unplaced) {
             // Open unplaced folder
 
-        } else if (id == R.id.nav_new_item) {
+        }*/
+        if (id == R.id.nav_new_item) {
             // Add new folder
-
+            startActivity(new Intent(Home.this, EditFolderActivity.class));
         } else if (id == R.id.nav_settings) {
             //  Open settings
 
         } else if (id == R.id.nav_about) {
             // About us
-
+            startActivity(new Intent(Home.this, AboutActivity.class));
         } else if (id == R.id.nav_logout) {
             // Log out from app
             AuthUI.getInstance()
@@ -310,7 +312,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     /**
      * Shows the progress UI and hides the login form. It only shows the progress spinner if the api running on the phone supports it.
      *
-     * @param dbReady should only be used by the DatabaseManager to tell the UI that the data is ready.
+     * @param dbReady should only be true when used by the DatabaseManager to tell the UI that the data is ready.
      */
     public void updateUI(boolean dbReady) {
         // Check if this is the first call. Only executed if the database was not ready and it is now.
@@ -337,18 +339,19 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     /**
-     * Orders the folders of {@link Home#mOrderedFolders} based on proximity to the user's location..
+     * Orders the folders of {@link Home#mAllOrderedFolders} based on proximity to the user's location..
      */
     private void setFoldersInOrder() {
-        mOrderedFolders = new LinkedHashMap<String, Folder>();
+        mAllOrderedFolders = new LinkedHashMap<String, Folder>();
+        LinkedHashMap<String, Folder> visibleOrderedFolders = new LinkedHashMap<String, Folder>();
         // If it is not empty if will calculate the order and change it.
         if (!dbManager.getFolders().isEmpty()) {
             LinkedHashMap<String, Integer> fdistances = new LinkedHashMap<String, Integer>();
             LinkedHashMap<String, Integer> ordered = new LinkedHashMap<String, Integer>();
 
-            //For each entry in the folders hashmap we calculate its postition
-            for (String x : dbManager.getFolders().keySet()) {
-                fdistances.put(x, calculateOrder(dbManager.getFolders().get(x).getLocation()));
+            //For each entry in the folders hashmap we calculate its position.
+            for (String folderId : dbManager.getFolders().keySet()) {
+                fdistances.put(folderId, calculateOrder(dbManager.getFolders().get(folderId).getLocation()));
             }
             //Reorder the folders
             fdistances.entrySet()
@@ -356,11 +359,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                     .sorted(Map.Entry.comparingByValue())
                     .forEachOrdered(x -> ordered.put(x.getKey(), x.getValue()));
             //store them ordered
-            for (String x : ordered.keySet()) {
-                mOrderedFolders.put(x, dbManager.getFolders().get(x));
+            for (String folderId : ordered.keySet()) {
+                mAllOrderedFolders.put(folderId, dbManager.getFolders().get(folderId));
+                // Filter in case we have selected a single folder.
+                if (mFoldersVisibleIds.contains(folderId) || mFoldersVisibleIds.isEmpty()) {
+                    visibleOrderedFolders.put(folderId, dbManager.getFolders().get(folderId));
+                }
             }
         }
-        mFolderAdapter.setMFolderData(mOrderedFolders);
+        mFolderAdapter.setMFolderData(visibleOrderedFolders);
     }
 
     /**
@@ -410,7 +417,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         menuItems.clear();
 
         int i = 0;
-        for (Map.Entry<String, Folder> entry : mOrderedFolders.entrySet()) {
+        for (Map.Entry<String, Folder> entry : mAllOrderedFolders.entrySet()) {
             String folderId = entry.getKey();
             Folder folder = entry.getValue();
 
@@ -422,12 +429,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 aux_menu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        //TODO: Intent to folder view
+                        mFoldersVisibleIds.clear();
+                        mFoldersVisibleIds.add(folderId);
+                        updateUI(false);
                         return true;
                     }
                 });
             } catch (IllegalArgumentException e) {
-                Log.d("XZY--Populate NavView", "Order exception has jumped");
+                Log.d("Home | Populate NavView", "Order exception has jumped");
             }
 
             // We need to keep track of what is inside so:
@@ -509,5 +518,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 dbManager.editFolder(folderId, folderName, latLngCus, getIntent().getStringExtra("Color"));
             }
         }
+    }
+
+    public HashSet<String> getmFoldersVisibleIds() {
+        return mFoldersVisibleIds;
     }
 }

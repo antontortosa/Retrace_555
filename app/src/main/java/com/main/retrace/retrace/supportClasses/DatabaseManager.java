@@ -203,4 +203,8 @@ public class DatabaseManager {
     public void setFolders(HashMap<String, Folder> folders) {
         this.folders = folders;
     }
+
+    public Home getHome() {
+        return home;
+    }
 }

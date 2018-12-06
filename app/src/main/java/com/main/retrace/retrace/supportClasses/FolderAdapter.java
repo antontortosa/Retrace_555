@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -99,6 +100,9 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
                             case R.id.folder_menu_open:
                                 //handle menu1 click
                                 //TODO: folder menu open create.
+                                databaseManager.getHome().getmFoldersVisibleIds().clear();
+                                databaseManager.getHome().getmFoldersVisibleIds().add(folderId);
+                                databaseManager.getHome().updateUI(false);
                                 break;
                             case R.id.folder_menu_edit:
                                 Intent intent = new Intent(context, EditFolderActivity.class);
@@ -231,6 +235,8 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
                         String text = v.getText().toString();
                         databaseManager.writeTask(folderId, new Task(text, Calendar.getInstance().getTime(), null));
+                        InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                         return true;
                     }
                     return false;
@@ -243,6 +249,9 @@ public class FolderAdapter extends Adapter<FolderAdapter.MyViewHolder> {
                     if ((keyevent.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                         String text = ((TextView) view).getText().toString();
                         databaseManager.writeTask(folderId, new Task(text, Calendar.getInstance().getTime(), null));
+                        ((TextInputEditText) view).setText("");
+                        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                         return true;
                     }
                     return false;

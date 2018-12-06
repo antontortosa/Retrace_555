@@ -2,23 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-    <group
-        android:id="@+id/lazy_group"
-        android:checkableBehavior="single">
 
-    </group>
     <group
         android:id="@+id/menu_top"
         android:checkableBehavior="single"
         android:orderInCategory="2147483646">
-        <item
+        <!--<item
+        TODO: implement the Unplaced folder.
             android:id="@+id/nav_unplaced"
             android:icon="@drawable/not_placeholder"
             android:title="@string/nav_drawer_unplaced" />
+            -->
         <item
             android:id="@+id/nav_new_item"
             android:icon="@drawable/add"
             android:title="@string/nav_drawer_nwfolder" />
+        <item
+            android:id="@+id/nav_show_home"
+            android:icon="@drawable/add"
+            android:title="@string/nav_drawer_nwfolder" />
+    </group>
+
+    <group
+        android:id="@+id/lazy_group"
+        android:checkableBehavior="single">
+
     </group>
 
     <group
